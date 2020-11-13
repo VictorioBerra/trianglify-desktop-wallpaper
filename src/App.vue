@@ -1,10 +1,11 @@
 <template>
   <v-app>
     <v-app-bar
+      class="mt-7"
       app
-      color="primary"
       dark
     >
+
       <div class="d-flex align-center">
         <v-img
           alt="Trianglify Wallpaper Logo"
@@ -15,6 +16,8 @@
           width="40"
         />
       </div>
+
+      <v-toolbar-title>Trianglify Wallpaper</v-toolbar-title>
 
       <v-spacer></v-spacer>
 

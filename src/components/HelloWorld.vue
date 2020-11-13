@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-row>
+    <v-row class="mb-6">
       <!-- <v-col cols="12">
         <v-img
           :src="require('../assets/logo.svg')"
@@ -10,36 +10,49 @@
         />
       </v-col> -->
 
-      <v-col class="mb-4">
-      <v-list dense>
-        <v-subheader>Screens</v-subheader>
-        <v-list-item-group
-          color="primary"
-        >
-          <v-list-item
-            v-for="(screen, i) in screens"
-            :key="i"
+      <v-col
+        cols="4">
+        <v-list dense>
+          <v-subheader>Screens</v-subheader>
+          <v-list-item-group
+            color="primary"
           >
-            <v-list-item-content>
-              <v-list-item-title>{{screen.id}}</v-list-item-title>
-              <v-list-item-subtitle>W{{screen.size.width}} x H{{screen.size.height}}</v-list-item-subtitle>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list-item-group>
-      </v-list>
-
+            <v-list-item
+              v-for="(screen, i) in screens"
+              :key="i"
+            >
+              <v-list-item-content>
+                <v-list-item-title>{{screen.id}}</v-list-item-title>
+                <v-list-item-subtitle>W{{screen.size.width}} x H{{screen.size.height}}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list-item-group>
+        </v-list>
       </v-col>
 
       <v-col
-        class="mb-5"
-        cols="12"
+        cols="8"
       >
-        <v-row justify="center">
-                  <v-btn v-on:click="generate"
-                    elevation="2"
-                  >Generate!</v-btn>
-        </v-row>
+
+        <v-img v-bind:src="wallpaper" />
+        
+        <v-btn v-on:click="generate"
+          class="mt-6"
+          elevation="2"
+          color="primary"
+        >Generate</v-btn>
       </v-col>
+    </v-row>
+    <v-row>
+        <v-col
+          cols="12"
+          sm="4"
+        >
+          <v-btn v-on:click="save"
+            elevation="2"
+            color="success"
+          >Save</v-btn>
+        </v-col>
     </v-row>
   </v-container>
 </template>
@@ -50,7 +63,8 @@ import trianglify from 'trianglify'
 
 export default {
   data: () => ({
-    screens: []
+    screens: [],
+    wallpaper: null
   }),
   name: 'HelloWorld',
   created: function(){
@@ -66,26 +80,40 @@ export default {
       };
     });
 
+    this.generate();
+
   },
   methods: {
-    generate: async function()
+    generate: function()
     {
+      // todo use primary size
         const pattern = trianglify({
-          width: 1024,
-          height: 1024
+          width: this.screens[0].size.width,
+          height: this.screens[0].size.height
         });
 
         const canvas = pattern.toCanvas();
 
-        // See the node-canvas docs for a full
-        // list of all the things you can do with this Canvas object:
-        // https://github.com/Automattic/node-canvas
-        var newWallpaperDataUrl = canvas.toDataURL();
+        this.wallpaper = canvas.toDataURL();
+    },
+    save: async function()
+    {
+        // const pattern = trianglify({
+        //   width: 1024,
+        //   height: 1024
+        // });
+
+        // const canvas = pattern.toCanvas();
+
+        // // See the node-canvas docs for a full
+        // // list of all the things you can do with this Canvas object:
+        // // https://github.com/Automattic/node-canvas
+        // var newWallpaperDataUrl = canvas.toDataURL();
 
         window.ipcRenderer.on('set-wallpaper-reply', () => {
           // some UI thing?
         })
-        window.ipcRenderer.send('set-wallpaper-message', newWallpaperDataUrl)
+        window.ipcRenderer.send('set-wallpaper-message', this.wallpaper)
 
 
         //         const fileName = path.join(this.tempPath, 'images', `${uuidv4().toString()}.png`)

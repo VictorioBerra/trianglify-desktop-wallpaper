@@ -36,6 +36,8 @@ async function createWindow() {
   win = new BrowserWindow({
     width: width * .75,
     height: height * .75,
+    frame: false,
+    titleBarStyle: 'hidden',
     title: 'Trianglify Wallpaper',
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
