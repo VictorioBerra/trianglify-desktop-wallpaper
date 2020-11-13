@@ -14,10 +14,14 @@
   },
   "main": "background.js",
   "dependencies": {
+    "chroma-js": "^2.1.0",
     "core-js": "^3.6.5",
+    "mkdirp": "^1.0.4",
     "trianglify": "^4.1.1",
+    "uuid": "^8.3.1",
     "vue": "^2.6.11",
-    "vuetify": "^2.2.11"
+    "vuetify": "^2.2.11",
+    "wallpaper": "^4.4.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

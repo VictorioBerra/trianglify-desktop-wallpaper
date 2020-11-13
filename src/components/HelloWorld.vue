@@ -1,27 +1,43 @@
 <template>
   <v-container>
-    <v-row class="text-center">
-      <v-col cols="12">
+    <v-row>
+      <!-- <v-col cols="12">
         <v-img
           :src="require('../assets/logo.svg')"
           class="my-3"
           contain
           height="200"
         />
-      </v-col>
+      </v-col> -->
 
       <v-col class="mb-4">
+      <v-list dense>
+        <v-subheader>Screens</v-subheader>
+        <v-list-item-group
+          color="primary"
+        >
+          <v-list-item
+            v-for="(screen, i) in screens"
+            :key="i"
+          >
+            <v-list-item-content>
+              <v-list-item-title>{{screen.id}}</v-list-item-title>
+              <v-list-item-subtitle>W{{screen.size.width}} x H{{screen.size.height}}</v-list-item-subtitle>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list-item-group>
+      </v-list>
+
       </v-col>
 
       <v-col
         class="mb-5"
         cols="12"
       >
-        <h2 class="headline font-weight-bold mb-3">
-          What's next?
-        </h2>
-
         <v-row justify="center">
+                  <v-btn v-on:click="generate"
+                    elevation="2"
+                  >Generate!</v-btn>
         </v-row>
       </v-col>
     </v-row>
@@ -30,18 +46,51 @@
 
 <script>
 import trianglify from 'trianglify'
-  export default {
-    name: 'HelloWorld',
-    created: () => {
-      const pattern = trianglify({
-        width: 1024,
-        height: 1024
-      });
+// import { v4 as uuidv4 } from "uuid"
 
-      pattern.toSVG();
-      pattern.toCanvas();
-    },
-    data: () => ({
-    }),
+export default {
+  data: () => ({
+    screens: []
+  }),
+  name: 'HelloWorld',
+  created: function(){
+
+    this.tempPath = window.ipcRenderer.sendSync('get-path-message', 'temp');
+    console.log(`Saving to: ${this.tempPath}`);
+    const screens = window.ipcRenderer.sendSync('get-screens-message');
+
+    this.screens = screens.map(function(screen){
+      return {
+        size: screen.size,
+        id: screen.id
+      };
+    });
+
+  },
+  methods: {
+    generate: async function()
+    {
+        const pattern = trianglify({
+          width: 1024,
+          height: 1024
+        });
+
+        const canvas = pattern.toCanvas();
+
+        // See the node-canvas docs for a full
+        // list of all the things you can do with this Canvas object:
+        // https://github.com/Automattic/node-canvas
+        var newWallpaperDataUrl = canvas.toDataURL();
+
+        window.ipcRenderer.on('set-wallpaper-reply', () => {
+          // some UI thing?
+        })
+        window.ipcRenderer.send('set-wallpaper-message', newWallpaperDataUrl)
+
+
+        //         const fileName = path.join(this.tempPath, 'images', `${uuidv4().toString()}.png`)
+        // const file = fs.createWriteStream(fileName)
+    }
   }
+}
 </script>

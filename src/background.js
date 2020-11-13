@@ -1,11 +1,16 @@
 'use strict'
 
 import path from 'path'
-import { app, protocol, BrowserWindow, screen, Tray, Menu } from 'electron'
+import fs from 'fs'
+import wallpaper from 'wallpaper'
+import { app, protocol, BrowserWindow, screen, Tray, Menu, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
+import { v4 as uuidv4 } from 'uuid';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
+import mkdirp from 'mkdirp'
+
 const isDevelopment = process.env.NODE_ENV !== 'production'
-const iconpath = path.join(__static, 'icon.png');
+const iconpath = path.join(__static, 'icon.png')
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -19,14 +24,15 @@ app.setAboutPanelOptions({
   authors: ['Victorio Berra'], 
   website: 'https://www.tberra.com/', 
   iconPath: iconpath, 
-}); 
+})
 
-let win = null;
-let tray = null;
+let win = null
+let tray = null
 
 async function createWindow() {
   // Create the browser window.
   const { width, height } = screen.getPrimaryDisplay().workAreaSize
+
   win = new BrowserWindow({
     width: width * .75,
     height: height * .75,
@@ -34,7 +40,8 @@ async function createWindow() {
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
-      nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION
+      nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
+      preload: path.join(__dirname, 'preload.js')
     },
     icon: iconpath
   })
@@ -76,6 +83,38 @@ async function createWindow() {
     win.loadURL('app://./index.html')
   }
 }
+
+ipcMain.on('set-wallpaper-message', (event, dataUrl) => {
+
+  const tempPath = path.join(app.getPath('temp'), 'images')
+
+  // TODO: User settings like image save path...
+  mkdirp.sync(tempPath)
+
+  var newFileName = path.join(tempPath, `${uuidv4().toString()}.png`);
+
+  console.log("newFileName", newFileName);
+  console.log("tempPath", tempPath);
+  //console.log("dataUrl", dataUrl);
+
+  // dataUrl to buffer
+  var buffer = Buffer.from(dataUrl.split(",")[1], 'base64');
+  fs.writeFileSync(newFileName, buffer);
+
+  wallpaper.set(newFileName);
+
+  event.reply('set-wallpaper-reply', 'done')
+})
+
+// Sync
+ipcMain.on('get-path-message', (event, arg) => {
+  event.returnValue = app.getPath(arg)
+})
+
+// Sync
+ipcMain.on('get-screens-message', (event, arg) => {
+  event.returnValue = screen.getAllDisplays()
+})
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
