@@ -1,26 +1,70 @@
 'use strict'
 
-import { app, protocol, BrowserWindow } from 'electron'
+import path from 'path'
+import { app, protocol, BrowserWindow, screen, Tray, Menu } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 const isDevelopment = process.env.NODE_ENV !== 'production'
+const iconpath = path.join(__static, 'icon.png');
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
 ])
 
+app.setAboutPanelOptions({ 
+  applicationName: 'About Trianglify Wallpaper', 
+  applicationVersion: '1.0.0', 
+  copyright: 'Victorio Berra 2020',
+  authors: ['Victorio Berra'], 
+  website: 'https://www.tberra.com/', 
+  iconPath: iconpath, 
+}); 
+
+let win = null;
+let tray = null;
+
 async function createWindow() {
   // Create the browser window.
-  const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize
+  win = new BrowserWindow({
+    width: width * .75,
+    height: height * .75,
+    title: 'Trianglify Wallpaper',
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION
-    }
+    },
+    icon: iconpath
   })
+
+  win.on('close', function (event) {
+      event.preventDefault();
+      win.hide();
+  });
+
+  tray = new Tray(iconpath)
+  const contextMenu = Menu.buildFromTemplate([
+    { 
+      label: 'Settings', 
+      type: 'normal', 
+      click: function() {
+        win.show();
+      } 
+    },
+    { label: 'About', type: 'normal', role: "about", },
+    { 
+      label: 'Quit', 
+      type: 'normal', 
+      click: function() {
+          win.destroy();
+          app.quit();
+      } 
+    },
+  ])
+  tray.setToolTip('Trianglify Wallpaper')
+  tray.setContextMenu(contextMenu)
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
