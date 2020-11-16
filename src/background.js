@@ -115,7 +115,10 @@ ipcMain.on('get-path-message', (event, arg) => {
 
 // Sync
 ipcMain.on('get-screens-message', (event, arg) => {
-  event.returnValue = screen.getAllDisplays()
+  event.returnValue = {
+    all: screen.getAllDisplays(),
+    primary: screen.getPrimaryDisplay()
+  };
 })
 
 // Quit when all windows are closed.

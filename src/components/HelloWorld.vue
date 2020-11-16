@@ -22,7 +22,7 @@
               :key="i"
             >
               <v-list-item-content>
-                <v-list-item-title>{{screen.id}}</v-list-item-title>
+                <v-list-item-title v-show="screen.isPrimary" class="text-uppercase">primary display</v-list-item-title>
                 <v-list-item-subtitle>W{{screen.size.width}} x H{{screen.size.height}}</v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
@@ -70,13 +70,13 @@ export default {
   created: function(){
 
     this.tempPath = window.ipcRenderer.sendSync('get-path-message', 'temp');
-    console.log(`Saving to: ${this.tempPath}`);
     const screens = window.ipcRenderer.sendSync('get-screens-message');
 
-    this.screens = screens.map(function(screen){
+    this.screens = screens.all.map(function(screen){
       return {
         size: screen.size,
-        id: screen.id
+        id: screen.id,
+        isPrimary: screen.id === screens.primary.id
       };
     });
 
@@ -110,6 +110,7 @@ export default {
         // // https://github.com/Automattic/node-canvas
         // var newWallpaperDataUrl = canvas.toDataURL();
 
+        // TODO: Dont expose ipcRenderer, just expose callbacks.
         window.ipcRenderer.on('set-wallpaper-reply', () => {
           // some UI thing?
         })
