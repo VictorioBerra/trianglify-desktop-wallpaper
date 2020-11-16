@@ -75,6 +75,28 @@ async function createWindow() {
   tray.setToolTip('Trianglify Wallpaper')
   tray.setContextMenu(contextMenu)
 
+  var menu = Menu.buildFromTemplate([
+    {
+      label: 'File',
+      submenu: [
+        {
+          label:'Minimize', 
+          click: () => {
+            win.hide();
+          }
+        },
+          {
+            label:'Quit', 
+            click: function() {
+              win.destroy();
+              app.quit();
+          } 
+        }
+      ]
+    }
+  ])
+  Menu.setApplicationMenu(menu);
+
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
