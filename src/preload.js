@@ -4,7 +4,8 @@ window.ipcRenderer = ipcRenderer
 const customTitlebar = require('custom-electron-titlebar');
 
 window.addEventListener('DOMContentLoaded', () => {
-    new customTitlebar.Titlebar({
-        backgroundColor: customTitlebar.Color.fromHex('#272727')
+    const customTitlebarInstance = new customTitlebar.Titlebar({
+        backgroundColor: customTitlebar.Color.fromHex('#272727'),
+        overflow: 'hidden'
     });
 })
