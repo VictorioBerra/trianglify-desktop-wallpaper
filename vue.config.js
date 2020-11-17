@@ -1,7 +1,10 @@
 module.exports = {
   pluginOptions: {
     electronBuilder: {
-      preload: 'src/preload.js'
+      preload: {
+        preload: 'src/preload.js',
+        preloadPreferences: 'src/preload-preferences.js'
+      }
     }
   },
   "transpileDependencies": [
@@ -11,6 +14,11 @@ module.exports = {
     index: {
       entry: 'src/main.js',
       title: 'Trianglify Wallpaper'
+    },
+    preferences: {
+      entry: 'src/main-preferences.js',
+      template: 'public/index.html',
+      title: 'Trianglify Wallpaper Preferences'
     }
   }
 }
