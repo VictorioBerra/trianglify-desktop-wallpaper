@@ -17,6 +17,8 @@
     "chroma-js": "^2.1.0",
     "core-js": "^3.6.5",
     "custom-electron-titlebar": "^3.2.5",
+    "electron-settings": "^4.0.2",
+    "lodash": "^4.17.20",
     "mkdirp": "^1.0.4",
     "trianglify": "^4.1.1",
     "uuid": "^8.3.1",
