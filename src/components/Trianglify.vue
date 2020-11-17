@@ -1,14 +1,6 @@
 <template>
   <v-container fluid>
     <v-row class="mb-6 mr-1 ml-1" justify="center" align="center">
-      <!-- <v-col cols="12">
-        <v-img
-          :src="require('../assets/logo.svg')"
-          class="my-3"
-          contain
-          height="200"
-        />
-      </v-col> -->
 
       <v-col cols="4">
         <!-- wallpaper NPM package only lets us a pick a screen on mac. So for now, were forcing main only. -->
@@ -53,6 +45,14 @@
               </v-row>
 
               <v-slider
+                label="Pattern Intensity"
+                v-model="patternIntensity"
+                max="1"
+                min="0"
+                step="0.01"
+              ></v-slider>
+
+              <v-slider
                 label="Triangle Variance"
                 v-model="triangleVariance"
                 max="1"
@@ -68,7 +68,7 @@
                 step="0.01"
               ></v-slider>
 
-              <v-btn>
+              <v-btn tile flat class="mb-6" block @click="randomize">
                 <v-icon>mdi-shuffle-variant</v-icon>
               </v-btn>
 
@@ -93,13 +93,13 @@
       <v-col cols="8">
         <canvas id="c" height="900" width="1440" />
         <v-row justify="center" align="center" class="mt-6">
-          <v-btn
+          <!-- <v-btn
             v-on:click="generateTrianglifyCanvas"
             color="primary"
             tile
             x-large
             >Generate</v-btn
-          >
+          > -->
           <v-btn v-on:click="save" color="success"             tile
             x-large>Set as Wallpaper</v-btn>
         </v-row>
@@ -142,6 +142,7 @@ export default {
     selectedScreenWidth: null,
 
     triangleVariance: 0.21,
+    patternIntensity: 0.3,
     cellSize: 0.05,
   }),
   watch: {
@@ -157,6 +158,9 @@ export default {
     selectedScreenHeight: function() {
       this.generateTrianglifyCanvas();
     },
+    patternIntensity: function() {
+      this.generateTrianglifyCanvas();
+    },
     triangleVariance: function() {
       this.generateTrianglifyCanvas();
     },
@@ -167,11 +171,25 @@ export default {
       this.generateTrianglifyCanvas();
     },
   },
-  // computed: {
-  //   selectedScreen: function () {
-  //
-  //   }
-  // },
+  methods: {
+    randomize () {
+      this.selectedColorPallet = null;
+      this.patternIntensity = _.random(0.01, 1.0)
+      this.triangleVariance = _.random(0.01, 1.0)
+      this.cellSize = _.random(.02, .25)
+      this.generateTrianglifyCanvas()
+    },
+    wallpaperSetEventHandler(event, err) {
+      if (err) {
+        this.$toast.error(err);
+      } else {
+        this.$toast.success("Wallpaper set!");
+      }
+    },
+    save: async function() {
+      window.ipcRenderer.send("set-wallpaper-message", this.wallpaper);
+    },
+  },
   name: "Trianglify",
   mounted() {
     window.ipcRenderer.on("set-wallpaper-reply", this.wallpaperSetEventHandler);
@@ -213,7 +231,8 @@ export default {
           Math.max(this.selectedScreenWidth, this.selectedScreenHeight) *
           this.cellSize,
         variance: this.triangleVariance,
-        xColors: 'random'
+        xColors: 'random',
+        colorFunction: _.memoize(trianglify.colorFunctions.interpolateLinear(this.patternIntensity))
       };
 
       if(this.selectedColorPallet !== null && this.selectedColorPallet) {
@@ -231,18 +250,6 @@ export default {
     }, 1000 / 15);
 
     this.generateTrianglifyCanvas();
-  },
-  methods: {
-    wallpaperSetEventHandler(event, err) {
-      if (err) {
-        this.$toast.error(err);
-      } else {
-        this.$toast.success("Wallpaper set!");
-      }
-    },
-    save: async function() {
-      window.ipcRenderer.send("set-wallpaper-message", this.wallpaper);
-    },
-  },
+  }
 };
 </script>
