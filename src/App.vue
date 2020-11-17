@@ -1,8 +1,10 @@
 <template>
   <v-app>
     <v-app-bar
-      class="mt-7"
       app
+      extended
+      extension-height="10"
+      class="pt-5"
       dark
     >
 
@@ -13,7 +15,7 @@
           contain
           src="./assets/logo.png"
           transition="scale-transition"
-          width="40"
+          width="30"
         />
       </div>
 
@@ -32,7 +34,7 @@
     </v-app-bar>
 
     <v-main>
-      <HelloWorld/>
+      <HelloWorld />
     </v-main>
   </v-app>
 </template>
@@ -41,7 +43,7 @@
 import HelloWorld from './components/HelloWorld';
 
 export default {
-  name: 'Trianglify Wallpaper',
+  name: 'trianglify-wallpaper',
 
   components: {
     HelloWorld,
