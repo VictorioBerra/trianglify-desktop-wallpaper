@@ -84,17 +84,12 @@ export default {
 
   },
   methods: {
-    generate: function()
-    {
-      // todo use primary size
-        const pattern = trianglify({
-          width: this.screens[0].size.width,
-          height: this.screens[0].size.height
-        });
-
-        const canvas = pattern.toCanvas();
-
-        this.wallpaper = canvas.toDataURL();
+    wallpaperSetEventHandler(event, err) {
+      if(err) {
+        this.$toast.error(err);
+      } else {
+        this.$toast.success("Wallpaper set!");
+      }
     },
     save: async function()
     {
