@@ -2,10 +2,9 @@
   <v-app>
     <v-app-bar
       app
-      extended
-      extension-height="10"
-      class="pt-5"
+      class="pt-5 transparent"
       dark
+      flat
     >
 
       <div class="d-flex align-center">
@@ -34,19 +33,19 @@
     </v-app-bar>
 
     <v-main>
-      <HelloWorld />
+      <Trianglify />
     </v-main>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
+import Trianglify from './components/Trianglify';
 
 export default {
   name: 'trianglify-wallpaper',
 
   components: {
-    HelloWorld,
+    Trianglify,
   },
 
   data: () => ({

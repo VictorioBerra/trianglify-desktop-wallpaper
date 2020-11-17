@@ -15,7 +15,6 @@
       <v-toolbar-title>Trianglify Wallpaper Preferences</v-toolbar-title>
 
       <v-spacer></v-spacer>
-
     </v-app-bar>
 
     <v-main>
@@ -27,6 +26,9 @@
             label="Image Save Folder"
             required
           ></v-text-field>
+          <v-btn text v-on:click="backupWallpaper"
+            >Copy Current Wallpaper to Image Save Folder</v-btn
+          >
         </v-form>
       </v-container>
     </v-main>
@@ -36,12 +38,13 @@
           <v-btn v-on:click="close" tile block>
             Close
           </v-btn>
-          <v-btn 
-          color="success" 
-          v-on:click="save" 
-          tile 
-          block
-          :disabled="!valid">
+          <v-btn
+            color="success"
+            v-on:click="save"
+            tile
+            block
+            :disabled="!valid"
+          >
             Save
           </v-btn>
         </v-col>
@@ -54,26 +57,40 @@
 export default {
   name: "trianglify-wallpaper-preferences",
   methods: {
-    close () {
-      window.hideWindow()
+    backupWallpaper() {
+      window.backupWallpaper();
     },
-    async save () {
-      this.$refs.form.validate()
-      if(this.valid) {
-        await window.settings.set('image.folder', this.imageFolder);
-        window.hideWindow()
+    close() {
+      window.hideWindow();
+    },
+    backupWallpaperReply(event, copyResponse) {
+      if (copyResponse.error === true) {
+        this.$toast.error(copyResponse.errorMessage);
+      } else {
+        this.$toast.success("Wallpaper copied to: " + copyResponse.newFileName);
       }
-    }
+    },
+    async save() {
+      this.$refs.form.validate();
+      if (this.valid) {
+        await window.settings.set("image.folder", this.imageFolder);
+        window.hideWindow();
+      }
+    },
+  },
+  mounted() {
+    window.backupWallpaperReplyOn(this.backupWallpaperReply);
+  },
+  destroy() {
+    window.backupWallpaperReplyOff(this.backupWallpaperReply);
   },
   created: async function() {
-    this.imageFolder = window.settings.getSync('image.folder');
+    this.imageFolder = window.settings.getSync("image.folder");
   },
   data: () => ({
     valid: true,
     imageFolder: null,
-    imageFolderRules: [
-      v => !!v || 'Image Save Folder is required'
-    ],
+    imageFolderRules: [(v) => !!v || "Image Save Folder is required"],
   }),
 };
 </script>

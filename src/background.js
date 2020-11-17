@@ -267,6 +267,33 @@ ipcMain.on("set-wallpaper-message", async (event, dataUrl) => {
   event.reply("set-wallpaper-reply");
 });
 
+ipcMain.on('copy-wallpaper-message', async (event, arg) => {
+  const response = {
+    error: null,
+    errorMessage: null,
+    newFileName: null
+  };
+
+  let userSettings = await settings.get();
+
+  const newFileName = `${uuidv4().toString()}.png`;
+  let newFilePath = path.join(userSettings.image.folder, newFileName);
+  response.newFileName = newFilePath;
+
+  var currentWallpaper = await wallpaper.get();
+
+  try {
+    await fs.copyFileSync(currentWallpaper, newFilePath);
+  } catch(err) {
+    if (err.code !== 'ENOENT') throw err;
+    response.error = true;
+    response.errorMessage = `No such file or directory '${currentWallpaper}'`;
+  }
+
+  event.reply("copy-wallpaper-reply", response);
+
+});
+
 ipcMain.on('set-window-hide-message', (event, arg) => {
   console.log('set-window-hide-message', arg);
   if(arg === "main") {
