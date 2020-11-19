@@ -1,24 +1,11 @@
 # triangle-wallpaper
 
-## Project setup
-```
-npm install
-```
+## TODO
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+Easy
+- Save intensity, variance and cell size and pattern to user preferences
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+Harder
+- Start on boot
+- Auto-update
+- Website?
