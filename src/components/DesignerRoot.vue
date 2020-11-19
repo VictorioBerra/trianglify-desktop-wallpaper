@@ -1,6 +1,5 @@
 <template>
-  <v-container fluid>
-    <v-row class="mb-6 mr-1 ml-1" justify="center" align="center">
+<v-row class="mb-6 mr-1 ml-1" justify="center" align="center">
 
       <v-col cols="4">
         <!-- wallpaper NPM package only lets us a pick a screen on mac. So for now, were forcing main only. -->
@@ -68,7 +67,7 @@
                 step="0.01"
               ></v-slider>
 
-              <v-btn tile flat class="mb-6" block @click="randomize">
+              <v-btn tile class="mb-6" block @click="randomize">
                 <v-icon>mdi-shuffle-variant</v-icon>
               </v-btn>
 
@@ -105,7 +104,6 @@
         </v-row>
       </v-col>
     </v-row>
-  </v-container>
 </template>
 <style scoped>
 #c {
@@ -119,12 +117,13 @@
 }
 </style>
 <script>
-import trianglify from "trianglify";
+import trianglify from "trianglify"; window.trianglify = trianglify;
 import Palette from "./Palette";
 import colorbrewer from "../colorbrewer";
 import _ from "lodash";
 
 export default {
+  name: "DesignerRoot",
   components: {
     Palette,
   },
@@ -190,14 +189,10 @@ export default {
       window.ipcRenderer.send("set-wallpaper-message", this.wallpaper);
     },
   },
-  name: "Trianglify",
   mounted() {
     window.ipcRenderer.on("set-wallpaper-reply", this.wallpaperSetEventHandler);
-    // How to unmount this?
     var c = document.getElementById("c");
-    var ctx = c.getContext("2d");
     this.vueCanvas = c;
-    this.vueCanvasContext = ctx;
   },
   destroyed() {
     window.ipcRenderer.removeListener(

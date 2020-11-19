@@ -2,7 +2,7 @@
   <v-app>
     <v-app-bar
       app
-      class="pt-5 transparent"
+      class="mt-5"
       dark
       flat
     >
@@ -22,6 +22,15 @@
 
       <v-spacer></v-spacer>
 
+      <template slot="extension">
+              <v-tabs
+        color="deep-orange accent-2"
+      icons-and-text>
+        <v-tab to="/"><v-icon>mdi-palette</v-icon> Designer</v-tab>
+        <v-tab to="/cron"><v-icon>mdi-alarm</v-icon> Cron</v-tab>
+      </v-tabs>
+      </template>
+
       <!-- <v-btn
         href="https://github.com/vuetifyjs/vuetify/releases/latest"
         target="_blank"
@@ -33,23 +42,21 @@
     </v-app-bar>
 
     <v-main>
-      <Trianglify />
+    <!-- Provides the application the proper gutter -->
+      <v-container fluid>
+
+        <!-- If using vue-router -->
+        <router-view></router-view>
+      </v-container>
     </v-main>
   </v-app>
 </template>
 
 <script>
-import Trianglify from './components/Trianglify';
 
 export default {
   name: 'trianglify-wallpaper',
-
-  components: {
-    Trianglify,
-  },
-
   data: () => ({
     //
-  }),
-};
-</script>
+  })
+}
