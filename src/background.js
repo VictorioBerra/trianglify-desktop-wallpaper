@@ -16,7 +16,6 @@ import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import { v4 as uuidv4 } from "uuid";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 import mkdirp from "mkdirp";
-import settings from 'electron-settings';
 import { combinedDisposable } from "custom-electron-titlebar/lib/common/lifecycle";
 
 // Some real hacky stuff here for "vuex-electron"
@@ -27,7 +26,7 @@ import store from './plugins/vuex'
 const storeInstance = store({ createPersistedState, createSharedMutations } )
 
 // Set up settings and defaults
-let imageSavePath = settings.getSync("image.folder");
+let imageSavePath = storeInstance.state.settings.image.saveFolder;
 if (!imageSavePath) {
   const defaultImageSavePath = path.join(
     app.getPath("pictures"),
@@ -35,7 +34,7 @@ if (!imageSavePath) {
   );
   mkdirp.sync(defaultImageSavePath);
   imageSavePath = defaultImageSavePath;
-  settings.setSync("image.folder", defaultImageSavePath);
+  storeInstance.dispatch("settingsImageSavePath", defaultImageSavePath);
 }
 
 const isDevelopment = process.env.NODE_ENV !== "production";
@@ -252,9 +251,9 @@ if (isDevelopment) {
 
 ipcMain.on("set-wallpaper-message", async (event, dataUrl) => {
 
-  let userSettings = await settings.get();
+  let userSettings = await storeInstance.store.settings;
 
-  let newFileName = path.join(userSettings.image.folder, `${uuidv4().toString()}.png`);
+  let newFileName = path.join(userSettings.image.saveFolder, `${uuidv4().toString()}.png`);
 
   // dataUrl to buffer
   let buffer = Buffer.from(dataUrl.split(",")[1], "base64");
@@ -265,7 +264,7 @@ ipcMain.on("set-wallpaper-message", async (event, dataUrl) => {
   }
   catch (err) {
     if (err.code !== 'ENOENT') throw err;
-    event.reply("set-wallpaper-reply", `No such file or directory '${userSettings.image.folder}'`);
+    event.reply("set-wallpaper-reply", `No such file or directory '${userSettings.image.saveFolder}'`);
     return;
   }
 

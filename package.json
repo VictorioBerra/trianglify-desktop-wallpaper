@@ -20,7 +20,6 @@
     "core-js": "^3.6.5",
     "cron": "^1.8.2",
     "custom-electron-titlebar": "^3.2.5",
-    "electron-settings": "^4.0.2",
     "lodash": "^4.17.20",
     "mkdirp": "^1.0.4",
     "trianglify": "^6.1.1",

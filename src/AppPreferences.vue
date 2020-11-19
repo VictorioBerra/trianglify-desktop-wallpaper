@@ -73,10 +73,19 @@ export default {
     async save() {
       this.$refs.form.validate();
       if (this.valid) {
-        await window.settings.set("image.folder", this.imageFolder);
-        window.hideWindow();
+        await this.$store.dispatch('settingsImageSavePath', this.localImageFilePath)
       }
     },
+  },
+  computed: {
+    imageFolder: {
+      get () {
+        return this.$store.state.settings.image.savePath
+      },
+      async set (value) {
+        this.localImageFilePath = value;
+      }
+    }
   },
   mounted() {
     window.backupWallpaperReplyOn(this.backupWallpaperReply);
@@ -84,12 +93,8 @@ export default {
   destroy() {
     window.backupWallpaperReplyOff(this.backupWallpaperReply);
   },
-  created: async function() {
-    this.imageFolder = window.settings.getSync("image.folder");
-  },
   data: () => ({
     valid: true,
-    imageFolder: null,
     imageFolderRules: [(v) => !!v || "Image Save Folder is required"],
   }),
 };

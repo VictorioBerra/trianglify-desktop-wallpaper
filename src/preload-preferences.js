@@ -1,7 +1,8 @@
-import settings from 'electron-settings';
 import { ipcRenderer } from 'electron'
+import { createPersistedState, createSharedMutations } from "vuex-electron"
 
-window.settings = settings
+window.createPersistedState = createPersistedState
+window.createSharedMutations = createSharedMutations
 
 window.backupWallpaperReplyOn = function(cb){
     ipcRenderer.on('copy-wallpaper-reply', cb)

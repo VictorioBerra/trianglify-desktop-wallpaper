@@ -9,6 +9,11 @@ export default (vuexElectronDeps) => new Vuex.Store({
 		vuexElectronDeps.createSharedMutations()
 	],
 	state: {
+		settings: {
+			image: {
+				saveFolder: null // set in background.js
+			}
+		},
 		triangleVariance: 0.21,
 		patternIntensity: 0.3,
 		cellSize: 0.05,
@@ -27,6 +32,10 @@ export default (vuexElectronDeps) => new Vuex.Store({
 		selectedColorPalletSet(state, payload) {
 			state.selectedColorPallet = payload;
 		},
+		settingsImageSavePathSet(state, payload) {
+			console.log('settingsImageSavePathSet - Saving: ' + payload);
+			state.settings.image.savePath = payload;
+		},
 	},
 	actions: {
 		triangleVariance({ commit }, variance) {
@@ -40,6 +49,9 @@ export default (vuexElectronDeps) => new Vuex.Store({
 		},
 		selectedColorPallet({ commit }, colorpalette) {
 			commit('selectedColorPalletSet', colorpalette);
+		},
+		settingsImageSavePath({ commit }, imageSavePath) {
+			commit('settingsImageSavePathSet', imageSavePath);
 		},
 	}
 });
