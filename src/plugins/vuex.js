@@ -3,23 +3,43 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-export default new Vuex.Store({
+export default (vuexElectronDeps) => new Vuex.Store({
+	plugins: [
+		vuexElectronDeps.createPersistedState(),
+		vuexElectronDeps.createSharedMutations()
+	],
 	state: {
-		count: 0
+		triangleVariance: 0.21,
+		patternIntensity: 0.3,
+		cellSize: 0.05,
+		selectedColorPallet: null,
 	},
 	mutations: {
-		add(state, payload) {
-			// If we get a payload, add it to count
-			// Else, just add one to count
-			payload ? (state.count += payload) : state.count++;
+		triangleVarianceSet(state, payload) {
+			state.triangleVariance = payload;
 		},
-		subtract(state, payload) {
-			payload ? (state.count -= payload) : state.count--;
-		}
+		patternIntensitySet(state, payload) {
+			state.patternIntensity = payload;
+		},
+		cellSizeSet(state, payload) {
+			state.cellSize = payload;
+		},
+		selectedColorPalletSet(state, payload) {
+			state.selectedColorPallet = payload;
+		},
 	},
 	actions: {
-		addThreeAsync({ commit }) {
-			setTimeout(() => commit('add', 3), 3000);
-		}
+		triangleVariance({ commit }, variance) {
+			commit('triangleVarianceSet', variance);
+		},
+		patternIntensity({ commit }, intensity) {
+			commit('patternIntensitySet', intensity);
+		},
+		cellSize({ commit }, cellSize) {
+			commit('cellSizeSet', cellSize);
+		},
+		selectedColorPallet({ commit }, colorpalette) {
+			commit('selectedColorPalletSet', colorpalette);
+		},
 	}
 });

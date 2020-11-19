@@ -1,5 +1,9 @@
 import { ipcRenderer } from 'electron'
+import { createPersistedState, createSharedMutations } from "vuex-electron"
+
 window.ipcRenderer = ipcRenderer
+window.createPersistedState = createPersistedState
+window.createSharedMutations = createSharedMutations
 
 const customTitlebar = require('custom-electron-titlebar');
 

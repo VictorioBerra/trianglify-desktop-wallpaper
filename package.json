@@ -31,6 +31,7 @@
     "vuetify": "^2.2.11",
     "vuetify-toast-snackbar": "^0.6.1",
     "vuex": "^3.5.1",
+    "vuex-electron": "^1.0.3",
     "wallpaper": "^4.4.1"
   },
   "devDependencies": {

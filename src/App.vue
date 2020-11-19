@@ -26,8 +26,8 @@
               <v-tabs
         color="deep-orange accent-2"
       icons-and-text>
-        <v-tab to="/"><v-icon>mdi-palette</v-icon> Designer</v-tab>
-        <v-tab to="/cron"><v-icon>mdi-alarm</v-icon> Cron</v-tab>
+        <v-tab to="/">DESIGNER <v-icon>mdi-palette</v-icon></v-tab>
+        <v-tab to="/cron">SCHEDULE <v-icon>mdi-alarm</v-icon></v-tab>
       </v-tabs>
       </template>
 

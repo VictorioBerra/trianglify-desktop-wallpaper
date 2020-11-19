@@ -19,6 +19,13 @@ import mkdirp from "mkdirp";
 import settings from 'electron-settings';
 import { combinedDisposable } from "custom-electron-titlebar/lib/common/lifecycle";
 
+// Some real hacky stuff here for "vuex-electron"
+// "vuex-electron" needs to run here in the main process and also in renderer
+// Renderer uses preload and sets these on window.
+import { createPersistedState, createSharedMutations } from "vuex-electron"
+import store from './plugins/vuex'
+const storeInstance = store({ createPersistedState, createSharedMutations } )
+
 // Set up settings and defaults
 let imageSavePath = settings.getSync("image.folder");
 if (!imageSavePath) {

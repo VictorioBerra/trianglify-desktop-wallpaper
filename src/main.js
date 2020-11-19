@@ -9,6 +9,9 @@ Vue.config.productionTip = false
 new Vue({
   vuetify,
   router,
-  store,
+  store: store({
+    createPersistedState: window.createPersistedState,
+    createSharedMutations: window.createSharedMutations
+  }),
   render: h => h(App)
 }).$mount('#app')

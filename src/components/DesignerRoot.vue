@@ -117,9 +117,10 @@
 }
 </style>
 <script>
-import trianglify from "trianglify"; window.trianglify = trianglify;
+import trianglify from "trianglify";
 import Palette from "./Palette";
 import colorbrewer from "../colorbrewer";
+// import { mapState, mapActions } from 'vuex'
 import _ from "lodash";
 
 export default {
@@ -133,17 +134,45 @@ export default {
     palettes: colorbrewer,
     wallpaper: null,
 
-    selectedColorPallet: null, // Object.keys(colorbrewer)[0] defaulting to random for now.
-
     selectedScreenId: null,
     selectedScreen: null,
     selectedScreenHeight: null,
     selectedScreenWidth: null,
-
-    triangleVariance: 0.21,
-    patternIntensity: 0.3,
-    cellSize: 0.05,
   }),
+  computed: {
+    triangleVariance: {
+      get () {
+        return this.$store.state.triangleVariance
+      },
+      async set (value) {
+        await this.$store.dispatch('triangleVariance', value)
+      }
+    },
+    patternIntensity: {
+      get () {
+        return this.$store.state.patternIntensity
+      },
+      async set (value) {
+        await this.$store.dispatch('ptternIntensity', value)
+      }
+    },
+    cellSize: {
+      get () {
+        return this.$store.state.cellSize
+      },
+      async set (value) {
+        await this.$store.dispatch('cellSize', value)
+      }
+    },
+    selectedColorPallet: {
+      get () {
+        return this.$store.state.selectedColorPallet
+      },
+      async set (value) {
+        await this.$store.dispatch('selectedColorPallet', value)
+      }
+    },
+  },
   watch: {
     selectedScreenId: function(val) {
       let selectedScreen = this.screens.find((x) => x.id == val);
@@ -238,8 +267,8 @@ export default {
 
       const pattern = trianglify(opts);
       const canvas = pattern.toCanvas(this.vueCanvas, {
-        applyCssScaling: false,
-      });
+      applyCssScaling: false // don't try to apply scaling with CSS
+    });
 
       this.wallpaper = canvas.toDataURL();
     }, 1000 / 15);
