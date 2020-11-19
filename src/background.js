@@ -251,9 +251,9 @@ if (isDevelopment) {
 
 ipcMain.on("set-wallpaper-message", async (event, dataUrl) => {
 
-  let userSettings = await storeInstance.store.settings;
+  let userSettings = await storeInstance.state.settings;
 
-  let newFileName = path.join(userSettings.image.saveFolder, `${uuidv4().toString()}.png`);
+  let newFileName = path.join(userSettings.image.savePath, `${uuidv4().toString()}.png`);
 
   // dataUrl to buffer
   let buffer = Buffer.from(dataUrl.split(",")[1], "base64");
@@ -264,7 +264,7 @@ ipcMain.on("set-wallpaper-message", async (event, dataUrl) => {
   }
   catch (err) {
     if (err.code !== 'ENOENT') throw err;
-    event.reply("set-wallpaper-reply", `No such file or directory '${userSettings.image.saveFolder}'`);
+    event.reply("set-wallpaper-reply", `No such file or directory '${userSettings.image.savePath}'`);
     return;
   }
 

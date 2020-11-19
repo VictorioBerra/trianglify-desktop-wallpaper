@@ -14,6 +14,8 @@ export default (vuexElectronDeps) => new Vuex.Store({
 				saveFolder: null // set in background.js
 			}
 		},
+		enableRandomCron: false,
+		randomCronExpression: "*/1 * * * *",
 		triangleVariance: 0.21,
 		patternIntensity: 0.3,
 		cellSize: 0.05,
@@ -32,6 +34,13 @@ export default (vuexElectronDeps) => new Vuex.Store({
 		selectedColorPalletSet(state, payload) {
 			state.selectedColorPallet = payload;
 		},
+		enableRandomCronSet(state, payload) {
+			state.enableRandomCron = payload;
+		},
+		randomCronExpressionSet(state, payload) {
+			state.randomCronExpression = payload;
+		},
+
 		settingsImageSavePathSet(state, payload) {
 			console.log('settingsImageSavePathSet - Saving: ' + payload);
 			state.settings.image.savePath = payload;
@@ -50,6 +59,13 @@ export default (vuexElectronDeps) => new Vuex.Store({
 		selectedColorPallet({ commit }, colorpalette) {
 			commit('selectedColorPalletSet', colorpalette);
 		},
+		enableRandomCron({ commit }, enabled) {
+			commit('enableRandomCronSet', enabled);
+		},
+		randomCronExpression({ commit }, expression) {
+			commit('randomCronExpressionSet', expression);
+		},
+
 		settingsImageSavePath({ commit }, imageSavePath) {
 			commit('settingsImageSavePathSet', imageSavePath);
 		},
