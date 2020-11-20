@@ -256,6 +256,11 @@ if (isDevelopment) {
   }
 }
 
+const debouncedCronTimeChange = _.debounce(function(payload){
+  log.debug("randomCronExpression changed, setting new cron time.: " + payload);
+  randomCronWallpaperJob.setTime(new cron.CronTime(payload));
+  start();
+}, 500);
 ipcMain.on("vuex-mutations-notify-main", async (event, {type, payload}) => {
   log.debug("vuex icp system in background called: ", {type, payload});
   switch(type){
@@ -269,11 +274,7 @@ ipcMain.on("vuex-mutations-notify-main", async (event, {type, payload}) => {
       break;
     }
     case 'randomCronExpression': {
-      _.debounce(function(){
-        log.debug("randomCronExpression changed, setting new cron time.: " + payload);
-        randomCronWallpaperJob.setTime(new cron.CronTime(payload));
-        start();
-      }, 500);
+      debouncedCronTimeChange(payload);
       break;
     }
   }
