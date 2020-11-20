@@ -1,5 +1,5 @@
 <template>
-<v-row class="mb-6 mr-1 ml-1" justify="center" align="center">
+<v-row class="mb-6 mr-1 ml-1" justify="center">
 
       <v-col cols="4">
         <!-- wallpaper NPM package only lets us a pick a screen on mac. So for now, were forcing main only. -->
@@ -67,6 +67,10 @@
                 step="0.01"
               ></v-slider>
 
+              <v-checkbox label="Fill" v-model="fill" />
+
+              <v-text-field label="Stroke Width" v-model="strokeWidth" v-if="!fill" />
+
               <v-btn tile class="mb-6" block @click="randomize">
                 <v-icon>mdi-shuffle-variant</v-icon>
               </v-btn>
@@ -90,23 +94,18 @@
       </v-col>
 
       <v-col cols="8">
-        <canvas id="c" height="900" width="1440" />
+        <canvas id="mainDesignerCanvas" height="900" width="1440" />
+        <canvas id="randomCronCanvas" style="display: none;"/>
         <v-row justify="center" align="center" class="mt-6">
-          <!-- <v-btn
-            v-on:click="generateTrianglifyCanvas"
-            color="primary"
-            tile
-            x-large
-            >Generate</v-btn
-          > -->
           <v-btn v-on:click="save" color="success"             tile
             x-large>Set as Wallpaper</v-btn>
         </v-row>
       </v-col>
     </v-row>
+
 </template>
 <style scoped>
-#c {
+#mainDesignerCanvas {
   max-height: 100%;
   max-width: 100%;
   flex: 1 1 auto;
@@ -120,7 +119,11 @@
 import trianglify from "trianglify";
 import Palette from "./Palette";
 import colorbrewer from "../colorbrewer";
+import memoizeOne from 'memoize-one';
 // import { mapState, mapActions } from 'vuex'
+
+let memoizedInterpolateLinearColorFunction = memoizeOne(trianglify.colorFunctions.interpolateLinear)
+
 import _ from "lodash";
 
 export default {
@@ -153,7 +156,7 @@ export default {
         return this.$store.state.patternIntensity
       },
       async set (value) {
-        await this.$store.dispatch('ptternIntensity', value)
+        await this.$store.dispatch('patternIntensity', value)
       }
     },
     cellSize: {
@@ -162,6 +165,22 @@ export default {
       },
       async set (value) {
         await this.$store.dispatch('cellSize', value)
+      }
+    },
+    fill: {
+      get () {
+        return this.$store.state.fill
+      },
+      async set (value) {
+        await this.$store.dispatch('fill', value)
+      }
+    },
+    strokeWidth: {
+      get () {
+        return this.$store.state.strokeWidth
+      },
+      async set (value) {
+        await this.$store.dispatch('strokeWidth', value)
       }
     },
     selectedColorPallet: {
@@ -187,6 +206,7 @@ export default {
       this.generateTrianglifyCanvas();
     },
     patternIntensity: function() {
+      window.log.warn("Watcher for patternIntensity!")
       this.generateTrianglifyCanvas();
     },
     triangleVariance: function() {
@@ -195,16 +215,23 @@ export default {
     cellSize: function() {
       this.generateTrianglifyCanvas();
     },
+    fill: function() {
+      this.generateTrianglifyCanvas();
+    },
+    strokeWidth: function() {
+      this.generateTrianglifyCanvas();
+    },
     selectedColorPallet: function() {
       this.generateTrianglifyCanvas();
     },
   },
   methods: {
     randomize () {
+      let trianglifyOptions = randomizeTrianglifyOptions();
       this.selectedColorPallet = null;
-      this.patternIntensity = _.random(0.01, 1.0)
-      this.triangleVariance = _.random(0.01, 1.0)
-      this.cellSize = _.random(.02, .25)
+      this.patternIntensity = trianglifyOptions.patternIntensity
+      this.triangleVariance =  trianglifyOptions.triangleVariance
+      this.cellSize =  trianglifyOptions.cellSize
       this.generateTrianglifyCanvas()
     },
     wallpaperSetEventHandler(event, err) {
@@ -214,20 +241,48 @@ export default {
         this.$toast.success("Wallpaper set!");
       }
     },
+    cronSetWallpaperCommandHandler() {
+        window.log.info("DesignerRoot handling random wallpaper set request.");
+
+        let trianglifyOptions = randomizeTrianglifyOptions();
+
+        let opts = {
+          palette: this.palettes,
+          width: this.selectedScreenWidth,
+          height: this.selectedScreenHeight,
+          cellSize:
+            Math.max(this.selectedScreenWidth, this.selectedScreenHeight) *
+            trianglifyOptions.cellSize,
+          variance: trianglifyOptions.triangleVariance,
+          xColors: 'random',
+          colorFunction: memoizedInterpolateLinearColorFunction(trianglifyOptions.patternIntensity)
+        };
+
+        const pattern = trianglify(opts);
+        const canvas = pattern.toCanvas(this.randomCronCanvas, {
+          applyCssScaling: false // don't try to apply scaling with CSS
+        });
+
+        window.ipcRenderer.send("set-wallpaper-message", canvas.toDataURL());
+        
+        this.$toast.success("Wallpaper set!");
+    },
     save: async function() {
       window.ipcRenderer.send("set-wallpaper-message", this.wallpaper);
     },
   },
   mounted() {
     window.ipcRenderer.on("set-wallpaper-reply", this.wallpaperSetEventHandler);
-    var c = document.getElementById("c");
-    this.vueCanvas = c;
+    window.cronSetWallpaperCommand(this.cronSetWallpaperCommandHandler);
+    this.mainDesignerCanvas = document.getElementById("mainDesignerCanvas");
+    this.randomCronCanvas = document.getElementById("randomCronCanvas");
   },
   destroyed() {
     window.ipcRenderer.removeListener(
       "set-wallpaper-reply",
       this.wallpaperSetEventHandler
     );
+     window.cronSetWallpaperCommandRemove(this.cronSetWallpaperCommandHandler);
   },
   created: function() {
     this.tempPath = window.ipcRenderer.sendSync("get-path-message", "temp");
@@ -256,24 +311,35 @@ export default {
           this.cellSize,
         variance: this.triangleVariance,
         xColors: 'random',
-        colorFunction: _.memoize(trianglify.colorFunctions.interpolateLinear(this.patternIntensity))
+        fill: this.fill,
+        strokeWidth: this.strokeWidth,
+        colorFunction: memoizedInterpolateLinearColorFunction(this.patternIntensity)
       };
 
       if(this.selectedColorPallet !== null && this.selectedColorPallet) {
         opts.xColors = this.palettes[this.selectedColorPallet];
       }
 
-      console.log(opts);
-
       const pattern = trianglify(opts);
-      const canvas = pattern.toCanvas(this.vueCanvas, {
-      applyCssScaling: false // don't try to apply scaling with CSS
-    });
+      const canvas = pattern.toCanvas(this.mainDesignerCanvas, {
+        applyCssScaling: false // don't try to apply scaling with CSS
+      });
 
       this.wallpaper = canvas.toDataURL();
+      
     }, 1000 / 15);
 
     this.generateTrianglifyCanvas();
   }
 };
+
+function randomizeTrianglifyOptions () {
+  return {
+    patternIntensity: _.random(0.01, 1.0),
+    triangleVariance: _.random(0.01, 1.0),
+    cellSize: _.random(.02, .25)
+  };
+}
+
+
 </script>

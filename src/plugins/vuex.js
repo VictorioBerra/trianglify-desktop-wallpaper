@@ -19,6 +19,8 @@ export default (vuexElectronDeps) => new Vuex.Store({
 		triangleVariance: 0.21,
 		patternIntensity: 0.3,
 		cellSize: 0.05,
+		fill: true,
+		strokeWidth: 0,
 		selectedColorPallet: null,
 	},
 	mutations: {
@@ -31,6 +33,12 @@ export default (vuexElectronDeps) => new Vuex.Store({
 		cellSizeSet(state, payload) {
 			state.cellSize = payload;
 		},
+		fillSet(state, payload) {
+			state.fill = payload;
+		},
+		strokeWidthSet(state, payload) {
+			state.strokeWidth = payload;
+		},
 		selectedColorPalletSet(state, payload) {
 			state.selectedColorPallet = payload;
 		},
@@ -42,7 +50,6 @@ export default (vuexElectronDeps) => new Vuex.Store({
 		},
 
 		settingsImageSavePathSet(state, payload) {
-			console.log('settingsImageSavePathSet - Saving: ' + payload);
 			state.settings.image.savePath = payload;
 		},
 	},
@@ -55,6 +62,12 @@ export default (vuexElectronDeps) => new Vuex.Store({
 		},
 		cellSize({ commit }, cellSize) {
 			commit('cellSizeSet', cellSize);
+		},
+		fill({ commit }, fill) {
+			commit('fillSet', fill);
+		},
+		strokeWidth({ commit }, strokeWidth) {
+			commit('strokeWidthSet', strokeWidth);
 		},
 		selectedColorPallet({ commit }, colorpalette) {
 			commit('selectedColorPalletSet', colorpalette);

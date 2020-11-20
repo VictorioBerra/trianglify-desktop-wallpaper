@@ -44,9 +44,9 @@
     <v-main>
     <!-- Provides the application the proper gutter -->
       <v-container fluid>
-
-        <!-- If using vue-router -->
-        <router-view></router-view>
+        <keep-alive>
+            <router-view></router-view>
+        </keep-alive>
       </v-container>
     </v-main>
   </v-app>

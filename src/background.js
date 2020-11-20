@@ -17,12 +17,17 @@ import { v4 as uuidv4 } from "uuid";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 import mkdirp from "mkdirp";
 import { combinedDisposable } from "custom-electron-titlebar/lib/common/lifecycle";
+import cron from "cron"
+import { DateTime } from 'luxon';
+import log from 'electron-log';
+import _ from "lodash"
 
 // Some real hacky stuff here for "vuex-electron"
 // "vuex-electron" needs to run here in the main process and also in renderer
 // Renderer uses preload and sets these on window.
 import { createPersistedState, createSharedMutations } from "vuex-electron"
 import store from './plugins/vuex'
+import { start } from "repl";
 const storeInstance = store({ createPersistedState, createSharedMutations } )
 
 // Set up settings and defaults
@@ -55,6 +60,7 @@ app.setAboutPanelOptions({
 });
 
 let win = null;
+let randomCronWallpaperJob = null;
 let winPreferences = null;
 let tray = null;
 
@@ -223,6 +229,16 @@ app.on("ready", async () => {
   }
   win = await createWindow();
   winPreferences = await createPreferencesWindow();
+
+  randomCronWallpaperJob = new cron.CronJob(storeInstance.state.randomCronExpression, function() {
+    log.info("CronJob random wallpaper job ran.");
+    win.webContents.send('cron-set-random-wallpaper-command', 'TODO: pallet or some payload.');
+  }, false, DateTime.local().zoneName);
+
+  if(storeInstance.state.enableRandomCron){
+    randomCronWallpaperJob.start();
+  }
+
 });
 
 // Exit cleanly on request from parent process in development mode.
@@ -240,20 +256,43 @@ if (isDevelopment) {
   }
 }
 
+ipcMain.on("vuex-mutations-notify-main", async (event, {type, payload}) => {
+  log.debug("vuex icp system in background called: ", {type, payload});
+  switch(type){
+    case 'enableRandomCron': {
+      log.debug("Call to enableRandomCron: " + payload);
+      if(payload){
+        randomCronWallpaperJob.start();
+      } else {
+        randomCronWallpaperJob.stop();
+      }
+      break;
+    }
+    case 'randomCronExpression': {
+      _.debounce(function(){
+        log.debug("randomCronExpression changed, setting new cron time.: " + payload);
+        randomCronWallpaperJob.setTime(new cron.CronTime(payload));
+        start();
+      }, 500);
+      break;
+    }
+  }
+})
 
 
 
 
-
-
-
-// TODO redo all this this way https://jaketrent.com/post/select-directory-in-electron/
+// TODO redo all this this way? why use this? https://jaketrent.com/post/select-directory-in-electron/
 
 ipcMain.on("set-wallpaper-message", async (event, dataUrl) => {
+
+  log.info("Setting wallpaper in background.js on set-wallpaper-message handler.");
 
   let userSettings = await storeInstance.state.settings;
 
   let newFileName = path.join(userSettings.image.savePath, `${uuidv4().toString()}.png`);
+
+  log.info("Saving wallpaper to: " + newFileName);
 
   // dataUrl to buffer
   let buffer = Buffer.from(dataUrl.split(",")[1], "base64");
@@ -280,7 +319,7 @@ ipcMain.on('copy-wallpaper-message', async (event, arg) => {
     newFileName: null
   };
 
-  let userSettings = await settings.get();
+  let userSettings = await storeInstance.state.settings;
 
   const newFileName = `${uuidv4().toString()}.png`;
   let newFilePath = path.join(userSettings.image.folder, newFileName);

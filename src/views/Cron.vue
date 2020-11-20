@@ -1,6 +1,8 @@
 <template>
   <div class="about">
-    <VueCronEditorVuetify v-model="cronExpression"/>
+    <p>Randomly set the wallpaper at specific intervals.</p>
+    <v-checkbox label="Enabled" v-model="enableRandomCron" />
+    <VueCronEditorVuetify v-model="randomCronExpression"/>
   </div>
 </template>
 <script>
@@ -9,8 +11,25 @@ export default {
   components: {
     VueCronEditorVuetify
   },
+  computed: {
+    randomCronExpression: {
+      get () {
+        return this.$store.state.randomCronExpression
+      },
+      async set (value) {
+        await this.$store.dispatch('randomCronExpression', value)
+      }
+    },
+    enableRandomCron: {
+      get () {
+        return this.$store.state.enableRandomCron
+      },
+      async set (value) {
+        await this.$store.dispatch('enableRandomCron', value)
+      }
+    },
+  },
   data: () => ({
-      cronExpression: "*/1 * * * *"
   }),
 }
 </script>
