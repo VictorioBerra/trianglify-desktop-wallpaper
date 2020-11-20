@@ -147,6 +147,15 @@ async function createWindow() {
         },
       ],
     },
+    {
+      label: "Help",
+      submenu: [
+        {
+          label: "About",
+          role: 'about'
+        },
+      ],
+    },
   ]);
   Menu.setApplicationMenu(menu);
 
@@ -259,7 +268,7 @@ if (isDevelopment) {
 const debouncedCronTimeChange = _.debounce(function(payload){
   log.debug("randomCronExpression changed, setting new cron time.: " + payload);
   randomCronWallpaperJob.setTime(new cron.CronTime(payload));
-  start();
+  randomCronWallpaperJob.start();
 }, 500);
 ipcMain.on("vuex-mutations-notify-main", async (event, {type, payload}) => {
   log.debug("vuex icp system in background called: ", {type, payload});
