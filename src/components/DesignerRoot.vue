@@ -1,9 +1,9 @@
 <template>
-<v-row class="mb-6 mr-1 ml-1" justify="center">
+  <v-row class="mb-6 mr-1 ml-1">
 
-      <v-col cols="4">
-        <!-- wallpaper NPM package only lets us a pick a screen on mac. So for now, were forcing main only. -->
-        <!-- <v-list dense>
+    <v-col cols="12" md="4" order="2" order-md="1">
+      <!-- wallpaper NPM package only lets us a pick a screen on mac. So for now, were forcing main only. -->
+      <!-- <v-list dense>
           <v-subheader>Screens</v-subheader>
           <v-list-item-group
             v-model="selectedScreenId"
@@ -22,95 +22,154 @@
           </v-list-item-group>
         </v-list> -->
 
-        <v-expansion-panels accordion v-model="customizationPanel">
-          <v-expansion-panel>
-            <v-expansion-panel-header ripple
-              >Customize</v-expansion-panel-header
+      <v-expansion-panels accordion v-model="customizationPanel">
+        <v-expansion-panel>
+          <v-expansion-panel-header ripple>Customize</v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <v-row>
+              <v-col cols="6">
+                <v-text-field
+                  v-model="selectedScreenHeight"
+                  label="Height"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="6">
+                <v-text-field
+                  v-model="selectedScreenWidth"
+                  label="Width"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+
+            <v-slider
+              label="Pattern Intensity"
+              v-model="patternIntensity"
+              max="1"
+              min="0"
+              step="0.01"
+            ></v-slider>
+
+            <v-slider
+              label="Triangle Variance"
+              v-model="triangleVariance"
+              max="1"
+              min="0"
+              step="0.01"
+            ></v-slider>
+
+            <v-slider
+              label="Cell Size"
+              v-model="cellSize"
+              max=".25"
+              min=".02"
+              step="0.01"
+            ></v-slider>
+
+            <v-checkbox label="Fill" v-model="fill" />
+
+            <v-text-field
+              label="Stroke Width"
+              v-model="strokeWidth"
+              v-if="!fill"
+            />
+
+            <v-btn tile class="mb-6" block @click="randomize">
+              <v-icon>mdi-shuffle-variant</v-icon>
+            </v-btn>
+
+            <v-tabs grow>
+              <v-tab>
+                Preset Palette
+              </v-tab>
+              <v-tab>
+                Custom Palette
+              </v-tab>
+              <v-tab-item>
+                <v-list dense style="max-height: 600px" class="overflow-y-auto mt-2">
+                  <v-list-item-group v-model="selectedColorPallet">
+                    <v-list-item
+                      v-for="(palette, name) in palettes"
+                      :key="name"
+                      :value="name"
+                    >
+                      <v-list-item-content>
+                        <Palette v-bind:colors="palette" />
+                      </v-list-item-content>
+                    </v-list-item>
+                  </v-list-item-group>
+                </v-list>
+              </v-tab-item>
+              <v-tab-item class="mt-2">
+                <v-dialog
+                      v-model="dialog"
+                      width="500"
+                    >
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-btn
+                          color="primary"
+                          dark
+                          v-bind="attrs"
+                          v-on="on"
+                        >
+                          Add
+                        </v-btn>
+                      </template>
+
+                      <v-card>
+
+                        <v-card-title>
+                          <span class="headline">Custom Color Palette</span>
+                        </v-card-title>
+
+                        <v-card-text>
+                          Coming Soon
+                        </v-card-text>
+
+                        <v-divider></v-divider>
+<!-- 
+                        <v-card-actions>
+                          <v-spacer></v-spacer>
+                          <v-btn
+                            color="primary"
+                            text
+                            @click="dialog = false"
+                          >
+                            I accept
+                          </v-btn>
+                        </v-card-actions> -->
+                      </v-card>
+                    </v-dialog>
+              </v-tab-item>
+            </v-tabs>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
+    </v-col>
+
+    <v-col cols="12" md="8" order="1" order-md="2">
+      <canvas id="mainDesignerCanvas" height="900" width="1440" />
+      <canvas id="randomCronCanvas" style="display: none;" />
+      <v-row justify="center" align="center" class="mt-6">
+        <v-btn v-on:click="saveAndSet" color="success" tile x-large
+          >Set as Wallpaper</v-btn
+        >
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-on:click="save"
+              color="primary"
+              tile
+              v-bind="attrs"
+              v-on="on"
+              x-large
+              >Save Wallpaper</v-btn
             >
-            <v-expansion-panel-content>
-              <v-row>
-                <v-col cols="6">
-                  <v-text-field
-                    v-model="selectedScreenHeight"
-                    label="Height"
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                  <v-text-field
-                    v-model="selectedScreenWidth"
-                    label="Width"
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-
-              <v-slider
-                label="Pattern Intensity"
-                v-model="patternIntensity"
-                max="1"
-                min="0"
-                step="0.01"
-              ></v-slider>
-
-              <v-slider
-                label="Triangle Variance"
-                v-model="triangleVariance"
-                max="1"
-                min="0"
-                step="0.01"
-              ></v-slider>
-
-              <v-slider
-                label="Cell Size"
-                v-model="cellSize"
-                max=".25"
-                min=".02"
-                step="0.01"
-              ></v-slider>
-
-              <v-checkbox label="Fill" v-model="fill" />
-
-              <v-text-field label="Stroke Width" v-model="strokeWidth" v-if="!fill" />
-
-              <v-btn tile class="mb-6" block @click="randomize">
-                <v-icon>mdi-shuffle-variant</v-icon>
-              </v-btn>
-
-              <v-list dense style="max-height: 600px" class="overflow-y-auto">
-                <v-subheader>Palettes</v-subheader>
-                <v-list-item-group
-                  v-model="selectedColorPallet"
-                >
-                  <v-list-item v-for="(palette, name) in palettes" :key="name" :value="name">
-                    <v-list-item-content>
-                      <Palette v-bind:colors="palette" />
-                    </v-list-item-content>
-                  </v-list-item>
-                </v-list-item-group>
-              </v-list>
-
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-expansion-panels>
-      </v-col>
-
-      <v-col cols="8">
-        <canvas id="mainDesignerCanvas" height="900" width="1440" />
-        <canvas id="randomCronCanvas" style="display: none;"/>
-        <v-row justify="center" align="center" class="mt-6">
-          <v-btn v-on:click="saveAndSet" color="success" tile
-            x-large>Set as Wallpaper</v-btn>
-          <v-tooltip bottom>
-              <template v-slot:activator="{ on, attrs }">
-          <v-btn v-on:click="save" color="primary" tile v-bind="attrs"
-          v-on="on"
-            x-large>Save Wallpaper</v-btn>
-              </template>
-              <span>{{savePathTooltip}}</span>
-            </v-tooltip>
-        </v-row>
-      </v-col>
-    </v-row>
-
+          </template>
+          <span>{{ savePathTooltip }}</span>
+        </v-tooltip>
+      </v-row>
+    </v-col>
+  </v-row>
 </template>
 <style scoped>
 #mainDesignerCanvas {
@@ -127,10 +186,12 @@
 import trianglify from "trianglify";
 import Palette from "./Palette";
 import colorbrewer from "../colorbrewer";
-import memoizeOne from 'memoize-one';
+import memoizeOne from "memoize-one";
 // import { mapState, mapActions } from 'vuex'
 
-let memoizedInterpolateLinearColorFunction = memoizeOne(trianglify.colorFunctions.interpolateLinear)
+let memoizedInterpolateLinearColorFunction = memoizeOne(
+  trianglify.colorFunctions.interpolateLinear
+);
 
 import _ from "lodash";
 
@@ -151,56 +212,56 @@ export default {
     selectedScreenWidth: null,
   }),
   computed: {
-    savePathTooltip (){
+    savePathTooltip() {
       return `Saving to: '${this.$store.state.settings.image.savePath}'. Change in settings.`;
     },
     triangleVariance: {
-      get () {
-        return this.$store.state.triangleVariance
+      get() {
+        return this.$store.state.triangleVariance;
       },
-      async set (value) {
-        await this.$store.dispatch('triangleVariance', value)
-      }
+      async set(value) {
+        await this.$store.dispatch("triangleVariance", value);
+      },
     },
     patternIntensity: {
-      get () {
-        return this.$store.state.patternIntensity
+      get() {
+        return this.$store.state.patternIntensity;
       },
-      async set (value) {
-        await this.$store.dispatch('patternIntensity', value)
-      }
+      async set(value) {
+        await this.$store.dispatch("patternIntensity", value);
+      },
     },
     cellSize: {
-      get () {
-        return this.$store.state.cellSize
+      get() {
+        return this.$store.state.cellSize;
       },
-      async set (value) {
-        await this.$store.dispatch('cellSize', value)
-      }
+      async set(value) {
+        await this.$store.dispatch("cellSize", value);
+      },
     },
     fill: {
-      get () {
-        return this.$store.state.fill
+      get() {
+        return this.$store.state.fill;
       },
-      async set (value) {
-        await this.$store.dispatch('fill', value)
-      }
+      async set(value) {
+        await this.$store.dispatch("fill", value);
+      },
     },
     strokeWidth: {
-      get () {
-        return this.$store.state.strokeWidth
+      get() {
+        return this.$store.state.strokeWidth;
       },
-      async set (value) {
-        await this.$store.dispatch('strokeWidth', value)
-      }
+      async set(value) {
+        await this.$store.dispatch("strokeWidth", value);
+      },
     },
     selectedColorPallet: {
-      get () {
-        return this.$store.state.selectedColorPallet
+      get() {
+        return this.$store.state.selectedColorPallet;
       },
-      async set (value) {
-        await this.$store.dispatch('selectedColorPallet', value)
-      }
+      async set(value) {
+        await this.$store.dispatch("selectedColorPallet", value);
+      },
     },
   },
   watch: {
@@ -217,7 +278,7 @@ export default {
       this.generateTrianglifyCanvas();
     },
     patternIntensity: function() {
-      window.log.warn("Watcher for patternIntensity!")
+      window.log.warn("Watcher for patternIntensity!");
       this.generateTrianglifyCanvas();
     },
     triangleVariance: function() {
@@ -237,13 +298,13 @@ export default {
     },
   },
   methods: {
-    randomize () {
+    randomize() {
       let trianglifyOptions = randomizeTrianglifyOptions();
       this.selectedColorPallet = null;
-      this.patternIntensity = trianglifyOptions.patternIntensity
-      this.triangleVariance =  trianglifyOptions.triangleVariance
-      this.cellSize =  trianglifyOptions.cellSize
-      this.generateTrianglifyCanvas()
+      this.patternIntensity = trianglifyOptions.patternIntensity;
+      this.triangleVariance = trianglifyOptions.triangleVariance;
+      this.cellSize = trianglifyOptions.cellSize;
+      this.generateTrianglifyCanvas();
     },
     wallpaperSetEventHandler(event, err) {
       // Currently err is not passed to this.
@@ -264,30 +325,32 @@ export default {
       }
     },
     cronSetWallpaperCommandHandler() {
-        window.log.info("DesignerRoot handling random wallpaper set request.");
+      window.log.info("DesignerRoot handling random wallpaper set request.");
 
-        let trianglifyOptions = randomizeTrianglifyOptions();
+      let trianglifyOptions = randomizeTrianglifyOptions();
 
-        let opts = {
-          palette: this.palettes,
-          width: this.selectedScreenWidth,
-          height: this.selectedScreenHeight,
-          cellSize:
-            Math.max(this.selectedScreenWidth, this.selectedScreenHeight) *
-            trianglifyOptions.cellSize,
-          variance: trianglifyOptions.triangleVariance,
-          xColors: 'random',
-          colorFunction: memoizedInterpolateLinearColorFunction(trianglifyOptions.patternIntensity)
-        };
+      let opts = {
+        palette: this.palettes,
+        width: this.selectedScreenWidth,
+        height: this.selectedScreenHeight,
+        cellSize:
+          Math.max(this.selectedScreenWidth, this.selectedScreenHeight) *
+          trianglifyOptions.cellSize,
+        variance: trianglifyOptions.triangleVariance,
+        xColors: "random",
+        colorFunction: memoizedInterpolateLinearColorFunction(
+          trianglifyOptions.patternIntensity
+        ),
+      };
 
-        const pattern = trianglify(opts);
-        const canvas = pattern.toCanvas(this.randomCronCanvas, {
-          applyCssScaling: false // don't try to apply scaling with CSS
-        });
+      const pattern = trianglify(opts);
+      const canvas = pattern.toCanvas(this.randomCronCanvas, {
+        applyCssScaling: false, // don't try to apply scaling with CSS
+      });
 
-        window.ipcRenderer.send("set-wallpaper-message", canvas.toDataURL());
-        
-        this.$toast.success("Wallpaper set!");
+      window.ipcRenderer.send("set-wallpaper-message", canvas.toDataURL());
+
+      this.$toast.success("Wallpaper set!");
     },
     saveAndSet: async function() {
       window.ipcRenderer.send("set-wallpaper-message", this.wallpaper);
@@ -299,7 +362,10 @@ export default {
   mounted() {
     // TODO: consistency
     window.ipcRenderer.on("set-wallpaper-reply", this.wallpaperSetEventHandler);
-    window.ipcRenderer.on("save-wallpaper-reply", this.wallpaperSaveEventHandler);
+    window.ipcRenderer.on(
+      "save-wallpaper-reply",
+      this.wallpaperSaveEventHandler
+    );
     window.cronSetWallpaperCommand(this.cronSetWallpaperCommandHandler);
     this.mainDesignerCanvas = document.getElementById("mainDesignerCanvas");
     this.randomCronCanvas = document.getElementById("randomCronCanvas");
@@ -313,7 +379,7 @@ export default {
       "save-wallpaper-reply",
       this.wallpaperSaveEventHandler
     );
-     window.cronSetWallpaperCommandRemove(this.cronSetWallpaperCommandHandler);
+    window.cronSetWallpaperCommandRemove(this.cronSetWallpaperCommandHandler);
   },
   created: function() {
     this.tempPath = window.ipcRenderer.sendSync("get-path-message", "temp");
@@ -332,7 +398,6 @@ export default {
 
     // https://stackoverflow.com/a/49780382/1777780
     this.generateTrianglifyCanvas = _.debounce(() => {
-
       let opts = {
         palette: this.palettes,
         width: this.selectedScreenWidth,
@@ -341,36 +406,35 @@ export default {
           Math.max(this.selectedScreenWidth, this.selectedScreenHeight) *
           this.cellSize,
         variance: this.triangleVariance,
-        xColors: 'random',
+        xColors: "random",
         fill: this.fill,
         strokeWidth: this.strokeWidth,
-        colorFunction: memoizedInterpolateLinearColorFunction(this.patternIntensity)
+        colorFunction: memoizedInterpolateLinearColorFunction(
+          this.patternIntensity
+        ),
       };
 
-      if(this.selectedColorPallet !== null && this.selectedColorPallet) {
+      if (this.selectedColorPallet !== null && this.selectedColorPallet) {
         opts.xColors = this.palettes[this.selectedColorPallet];
       }
 
       const pattern = trianglify(opts);
       const canvas = pattern.toCanvas(this.mainDesignerCanvas, {
-        applyCssScaling: false // don't try to apply scaling with CSS
+        applyCssScaling: false, // don't try to apply scaling with CSS
       });
 
       this.wallpaper = canvas.toDataURL();
-      
     }, 1000 / 15);
 
     this.generateTrianglifyCanvas();
-  }
+  },
 };
 
-function randomizeTrianglifyOptions () {
+function randomizeTrianglifyOptions() {
   return {
     patternIntensity: _.random(0.01, 1.0),
     triangleVariance: _.random(0.01, 1.0),
-    cellSize: _.random(.02, .25)
+    cellSize: _.random(0.02, 0.25),
   };
 }
-
-
 </script>
