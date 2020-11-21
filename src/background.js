@@ -71,6 +71,7 @@ async function createWindow() {
   let mainWindow = new BrowserWindow({
     width: width * 0.75,
     height: height * 0.75,
+    show: false,
     frame: false,
     titleBarStyle: "hidden",
     title: "Trianglify Wallpaper",
@@ -237,6 +238,8 @@ app.on("ready", async () => {
     }
   }
   win = await createWindow();
+  win.maximize();
+  win.show();
   winPreferences = await createPreferencesWindow();
 
   randomCronWallpaperJob = new cron.CronJob(storeInstance.state.randomCronExpression, function() {
