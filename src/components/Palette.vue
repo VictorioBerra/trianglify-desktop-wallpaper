@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card class="d-flex" flat tile>
+    <v-card class="d-md-flex" flat tile>
       <v-card
         v-for="color in colors"
         :key="color"
