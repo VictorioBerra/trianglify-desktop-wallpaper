@@ -2,7 +2,7 @@
   "name": "triangle-wallpaper",
   "Author": "Victorio Berra (toryberra@gmail.com)",
   "description": "Create and set wallpaper with Trianglify.",
-  "version": "0.1.0",
+  "version": "1.0.1",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -34,7 +34,7 @@
     "vuetify": "^2.2.11",
     "vuetify-toast-snackbar": "^0.6.1",
     "vuex": "^3.5.1",
-    "vuex-electron": "^1.0.3",
+    "vuex-electron": "^1.2.3",
     "wallpaper": "^4.4.1"
   },
   "devDependencies": {
