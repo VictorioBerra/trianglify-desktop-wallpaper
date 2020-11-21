@@ -246,10 +246,21 @@ export default {
       this.generateTrianglifyCanvas()
     },
     wallpaperSetEventHandler(event, err) {
+      // Currently err is not passed to this.
+      // TODO: Toggle button loading?
       if (err) {
         this.$toast.error(err);
       } else {
         this.$toast.success("Wallpaper set!");
+      }
+    },
+    wallpaperSaveEventHandler(event, err) {
+      // Currently err is not passed to this.
+      // TODO: Toggle button loading?
+      if (err) {
+        this.$toast.error(err);
+      } else {
+        this.$toast.success(`Wallpaper saved to ${this.savePathTooltip}!`);
       }
     },
     cronSetWallpaperCommandHandler() {
@@ -286,7 +297,9 @@ export default {
     },
   },
   mounted() {
+    // TODO: consistency
     window.ipcRenderer.on("set-wallpaper-reply", this.wallpaperSetEventHandler);
+    window.ipcRenderer.on("save-wallpaper-reply", this.wallpaperSaveEventHandler);
     window.cronSetWallpaperCommand(this.cronSetWallpaperCommandHandler);
     this.mainDesignerCanvas = document.getElementById("mainDesignerCanvas");
     this.randomCronCanvas = document.getElementById("randomCronCanvas");
@@ -295,6 +308,10 @@ export default {
     window.ipcRenderer.removeListener(
       "set-wallpaper-reply",
       this.wallpaperSetEventHandler
+    );
+    window.ipcRenderer.removeListener(
+      "save-wallpaper-reply",
+      this.wallpaperSaveEventHandler
     );
      window.cronSetWallpaperCommandRemove(this.cronSetWallpaperCommandHandler);
   },

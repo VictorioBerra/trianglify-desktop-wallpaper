@@ -274,7 +274,7 @@ const debouncedCronTimeChange = _.debounce(function(payload){
   log.debug("randomCronExpression changed, setting new cron time.: " + payload);
   randomCronWallpaperJob.setTime(new cron.CronTime(payload));
   if(storeInstance.state.enableRandomCron) {
-  randomCronWallpaperJob.start();
+    randomCronWallpaperJob.start();
   }
 }, 500);
 
