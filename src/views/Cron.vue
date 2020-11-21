@@ -2,7 +2,13 @@
   <div class="about">
     <p>Randomly set the wallpaper at specific intervals.</p>
     <v-checkbox label="Enabled" v-model="enableRandomCron" />
+
     <VueCronEditorVuetify v-model="randomCronExpression"/>
+
+    <v-text-field class="mt-4"
+      label="Webhook"
+      v-model="randomCronWebhook"
+    ></v-text-field>
   </div>
 </template>
 <script>
@@ -18,6 +24,14 @@ export default {
       },
       async set (value) {
         await this.$store.dispatch('randomCronExpression', value)
+      }
+    },
+    randomCronWebhook: {
+      get () {
+        return this.$store.state.randomCronWebhook
+      },
+      async set (value) {
+        await this.$store.dispatch('randomCronWebhook', value)
       }
     },
     enableRandomCron: {

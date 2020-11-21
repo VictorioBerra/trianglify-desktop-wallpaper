@@ -15,6 +15,7 @@ export default (vuexElectronDeps) => new Vuex.Store({
 			}
 		},
 		enableRandomCron: false,
+		randomCronWebhook: null,
 		randomCronExpression: "*/1 * * * *",
 		triangleVariance: 0.21,
 		patternIntensity: 0.3,
@@ -41,6 +42,10 @@ export default (vuexElectronDeps) => new Vuex.Store({
 		},
 		selectedColorPalletSet(state, payload) {
 			state.selectedColorPallet = payload;
+		},
+
+		randomCronWebhookSet(state, payload) {
+			state.randomCronWebhook = payload;
 		},
 		enableRandomCronSet(state, payload) {
 			state.enableRandomCron = payload;
@@ -71,6 +76,10 @@ export default (vuexElectronDeps) => new Vuex.Store({
 		},
 		selectedColorPallet({ commit }, colorpalette) {
 			commit('selectedColorPalletSet', colorpalette);
+		},
+
+		randomCronWebhook({ commit }, enabled) {
+			commit('randomCronWebhookSet', enabled);
 		},
 		enableRandomCron({ commit }, enabled) {
 			commit('enableRandomCronSet', enabled);

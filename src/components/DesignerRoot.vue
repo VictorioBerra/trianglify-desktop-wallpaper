@@ -1,6 +1,5 @@
 <template>
   <v-row class="mb-6 mr-1 ml-1">
-
     <v-col cols="12" md="4" order="2" order-md="1">
       <!-- wallpaper NPM package only lets us a pick a screen on mac. So for now, were forcing main only. -->
       <!-- <v-list dense>
@@ -85,7 +84,11 @@
                 Custom Palette
               </v-tab>
               <v-tab-item>
-                <v-list dense style="max-height: 600px" class="overflow-y-auto mt-2">
+                <v-list
+                  dense
+                  style="max-height: 600px"
+                  class="overflow-y-auto mt-2"
+                >
                   <v-list-item-group v-model="selectedColorPallet">
                     <v-list-item
                       v-for="(palette, name) in palettes"
@@ -100,45 +103,43 @@
                 </v-list>
               </v-tab-item>
               <v-tab-item class="mt-2">
-                <v-dialog
-                      v-model="dialog"
-                      width="500"
-                    >
-                      <template v-slot:activator="{ on, attrs }">
-                        <v-btn
-                          color="primary"
-                          dark
-                          v-bind="attrs"
-                          v-on="on"
+                <v-dialog v-model="dialog" width="500">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn color="primary" dark v-bind="attrs" v-on="on">
+                      Add
+                    </v-btn>
+                  </template>
+
+                  <v-card>
+                    <v-card-title>
+                      <span class="headline">Custom Color Palette</span>
+                    </v-card-title>
+
+                    <v-card-text>
+                      <v-card class="d-md-flex" flat tile>
+                        <v-card
+                          v-for="color in randomPalette(4)"
+                          :key="color"
+                          :style="{ backgroundColor: color }"
+                          class="pa-4 flex-grow-1"
+                          tile
                         >
-                          Add
-                        </v-btn>
-                      </template>
-
-                      <v-card>
-
-                        <v-card-title>
-                          <span class="headline">Custom Color Palette</span>
-                        </v-card-title>
-
-                        <v-card-text>
-                          Coming Soon
-                        </v-card-text>
-
-                        <v-divider></v-divider>
-<!-- 
-                        <v-card-actions>
-                          <v-spacer></v-spacer>
-                          <v-btn
-                            color="primary"
-                            text
-                            @click="dialog = false"
+                        </v-card>
+                        <v-card class="pa-4" tile>
+                          <v-btn icon class="transparent" block
+                            ><v-icon>mdi-plus</v-icon></v-btn
                           >
-                            I accept
-                          </v-btn>
-                        </v-card-actions> -->
+                        </v-card>
+                        <v-card class="pa-4" tile>
+                          <v-btn icon class="transparent" block
+                            ><v-icon>mdi-minus</v-icon></v-btn
+                          >
+                        </v-card>
                       </v-card>
-                    </v-dialog>
+                    </v-card-text>
+                    <v-divider></v-divider>
+                  </v-card>
+                </v-dialog>
               </v-tab-item>
             </v-tabs>
           </v-expansion-panel-content>
@@ -298,6 +299,9 @@ export default {
     },
   },
   methods: {
+    randomPalette(amount) {
+      return _.take(_.sample(this.palettes), amount);
+    },
     randomize() {
       let trianglifyOptions = randomizeTrianglifyOptions();
       this.selectedColorPallet = null;
@@ -323,6 +327,9 @@ export default {
       } else {
         this.$toast.success(`Wallpaper saved to ${this.savePathTooltip}!`);
       }
+    },
+    cronSetWallpaperCommandWebhookHandler(){
+      window.log.error(arguments)
     },
     cronSetWallpaperCommandHandler() {
       window.log.info("DesignerRoot handling random wallpaper set request.");
@@ -367,6 +374,7 @@ export default {
       this.wallpaperSaveEventHandler
     );
     window.cronSetWallpaperCommand(this.cronSetWallpaperCommandHandler);
+    window.cronSetWallpaperCommandWebhook(this.cronSetWallpaperCommandWebhookHandler);
     this.mainDesignerCanvas = document.getElementById("mainDesignerCanvas");
     this.randomCronCanvas = document.getElementById("randomCronCanvas");
   },
@@ -380,6 +388,7 @@ export default {
       this.wallpaperSaveEventHandler
     );
     window.cronSetWallpaperCommandRemove(this.cronSetWallpaperCommandHandler);
+    window.cronSetWallpaperCommandWebhookRemove(this.cronSetWallpaperCommandWebhookHandler);
   },
   created: function() {
     this.tempPath = window.ipcRenderer.sendSync("get-path-message", "temp");

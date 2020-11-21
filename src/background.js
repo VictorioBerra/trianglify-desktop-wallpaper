@@ -9,6 +9,7 @@ import {
   BrowserWindow,
   screen,
   Tray,
+  Notification,
   Menu,
   ipcMain,
 } from "electron";
@@ -21,6 +22,7 @@ import cron from "cron"
 import { DateTime } from 'luxon';
 import log from 'electron-log';
 import _ from "lodash"
+import axios from 'axios'
 
 // Some real hacky stuff here for "vuex-electron"
 // "vuex-electron" needs to run here in the main process and also in renderer
@@ -242,9 +244,49 @@ app.on("ready", async () => {
   win.show();
   winPreferences = await createPreferencesWindow();
 
-  randomCronWallpaperJob = new cron.CronJob(storeInstance.state.randomCronExpression, function() {
+  randomCronWallpaperJob = new cron.CronJob(storeInstance.state.randomCronExpression, async function() {
     log.info("CronJob random wallpaper job ran.");
     win.webContents.send('cron-set-random-wallpaper-command', 'TODO: pallet or some payload.');
+
+    var randomCronWebhook = storeInstance.state.randomCronWebhook;
+    if(randomCronWebhook !== null && randomCronWebhook.trim() !== "") {
+      log.info("Webhook detected, sending POST.");
+      let response = await axios.post(randomCronWebhook, 'Wallpaper set!')
+        .then(function(response){
+          return {
+            message: response.statusText,
+            error: false
+          };
+        })
+        .catch(function(error){
+          if (error.response) {
+            return {
+              error: true,
+              message: error.response.statusText
+            };
+          } else if (error.request) {
+            return {
+              error: true,
+              message: "The request was made but no response was received"
+            };
+          } else {
+            return {
+              error: true,
+              message: "Something happened in setting up the request that triggered an Error"
+            };
+          }
+        });
+
+        if(response.error) {
+          new Notification({
+            title: 'Trianglify Desktop Webhook Issue',
+            body: 'You have a webhook setup that is failing. See scheduler in app.'
+          }).show()
+        }
+
+      log.info("Webhook call complete, result: ", response);
+      win.webContents.send('cron-set-random-wallpaper-webhook-command', response);
+    }
   }, null, false, DateTime.local().zoneName);
 
   log.info("Starting job on first start? " + storeInstance.state.enableRandomCron);

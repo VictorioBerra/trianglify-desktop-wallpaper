@@ -22,6 +22,13 @@ window.cronSetWallpaperCommand = function(cb){
 }
 
 window.cronSetWallpaperCommandRemove = function(cb){
-    log.debug("Detaching cron set wallpaper handler");
     ipcRenderer.removeListener('cron-set-random-wallpaper-command', cb)
+}
+
+window.cronSetWallpaperCommandWebhook = function(cb){
+    ipcRenderer.on('cron-set-random-wallpaper-webhook-command', cb)
+}
+
+window.cronSetWallpaperCommandWebhookRemove = function(cb){
+    ipcRenderer.removeListener('cron-set-random-wallpaper-webhook-command', cb)
 }
