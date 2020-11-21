@@ -315,9 +315,9 @@ ipcMain.on("set-wallpaper-message", async (event, dataUrl) => {
 
 ipcMain.on("save-wallpaper-message", async (event, dataUrl) => {
 
-  var newFileName = await saveWallpaperipcMainHandler(event, dataUrl);
+  await saveWallpaperipcMainHandler(event, dataUrl);
 
-  event.reply("save-wallpaper-reply", newFileName);
+  event.reply("save-wallpaper-reply");
 });
 
 ipcMain.on('copy-wallpaper-message', async (event, arg) => {
