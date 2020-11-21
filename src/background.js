@@ -245,9 +245,11 @@ app.on("ready", async () => {
   randomCronWallpaperJob = new cron.CronJob(storeInstance.state.randomCronExpression, function() {
     log.info("CronJob random wallpaper job ran.");
     win.webContents.send('cron-set-random-wallpaper-command', 'TODO: pallet or some payload.');
-  }, false, DateTime.local().zoneName);
+  }, null, false, DateTime.local().zoneName);
 
-  if(storeInstance.state.enableRandomCron){
+  log.info("Starting job on first start? " + storeInstance.state.enableRandomCron);
+
+  if(storeInstance.state.enableRandomCron) {
     randomCronWallpaperJob.start();
   }
 
