@@ -97,8 +97,16 @@
         <canvas id="mainDesignerCanvas" height="900" width="1440" />
         <canvas id="randomCronCanvas" style="display: none;"/>
         <v-row justify="center" align="center" class="mt-6">
-          <v-btn v-on:click="save" color="success"             tile
+          <v-btn v-on:click="saveAndSet" color="success" tile
             x-large>Set as Wallpaper</v-btn>
+          <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+          <v-btn v-on:click="save" color="primary" tile v-bind="attrs"
+          v-on="on"
+            x-large>Save Wallpaper</v-btn>
+              </template>
+              <span>{{savePathTooltip}}</span>
+            </v-tooltip>
         </v-row>
       </v-col>
     </v-row>
@@ -143,6 +151,9 @@ export default {
     selectedScreenWidth: null,
   }),
   computed: {
+    savePathTooltip (){
+      return `Saving to: '${this.$store.state.settings.image.savePath}'. Change in settings.`;
+    },
     triangleVariance: {
       get () {
         return this.$store.state.triangleVariance
@@ -267,8 +278,11 @@ export default {
         
         this.$toast.success("Wallpaper set!");
     },
-    save: async function() {
+    saveAndSet: async function() {
       window.ipcRenderer.send("set-wallpaper-message", this.wallpaper);
+    },
+    save: async function() {
+      window.ipcRenderer.send("save-wallpaper-message", this.wallpaper);
     },
   },
   mounted() {

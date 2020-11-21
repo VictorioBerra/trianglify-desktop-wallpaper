@@ -301,30 +301,20 @@ ipcMain.on("vuex-mutations-notify-main", async (event, {type, payload}) => {
 
 ipcMain.on("set-wallpaper-message", async (event, dataUrl) => {
 
+  var newFileName = await saveWallpaperipcMainHandler(event, dataUrl);
+
   log.info("Setting wallpaper in background.js on set-wallpaper-message handler.");
-
-  let userSettings = await storeInstance.state.settings;
-
-  let newFileName = path.join(userSettings.image.savePath, `${uuidv4().toString()}.png`);
-
-  log.info("Saving wallpaper to: " + newFileName);
-
-  // dataUrl to buffer
-  let buffer = Buffer.from(dataUrl.split(",")[1], "base64");
-
-  try
-  {
-    fs.writeFileSync(newFileName, buffer);
-  }
-  catch (err) {
-    if (err.code !== 'ENOENT') throw err;
-    event.reply("set-wallpaper-reply", `No such file or directory '${userSettings.image.savePath}'`);
-    return;
-  }
 
   wallpaper.set(newFileName);
 
   event.reply("set-wallpaper-reply");
+});
+
+ipcMain.on("save-wallpaper-message", async (event, dataUrl) => {
+
+  var newFileName = await saveWallpaperipcMainHandler(event, dataUrl);
+
+  event.reply("save-wallpaper-reply", newFileName);
 });
 
 ipcMain.on('copy-wallpaper-message', async (event, arg) => {
@@ -392,3 +382,25 @@ ipcMain.on("set-preferences-closed", (event, arg) => {
     primary: screen.getPrimaryDisplay(),
   };
 });
+
+async function saveWallpaperipcMainHandler(event, dataUrl){
+  let userSettings = await storeInstance.state.settings;
+
+  let newFileName = path.join(userSettings.image.savePath, `${uuidv4().toString()}.png`);
+
+  log.info("Saving wallpaper to: " + newFileName);
+
+  // dataUrl to buffer
+  let buffer = Buffer.from(dataUrl.split(",")[1], "base64");
+
+  try
+  {
+    fs.writeFileSync(newFileName, buffer);
+    return newFileName;
+  }
+  catch (err) {
+    if (err.code !== 'ENOENT') throw err;
+    event.reply("set-wallpaper-reply", `No such file or directory '${userSettings.image.savePath}'`);
+    return;
+  }
+}
