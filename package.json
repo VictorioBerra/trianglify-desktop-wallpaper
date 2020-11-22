@@ -1,6 +1,10 @@
 {
   "name": "triangle-wallpaper",
-  "Author": "Victorio Berra (toryberra@gmail.com)",
+  "author": {
+    "name": "Victorio Berra",
+    "email": "toryberra@gmail.com",
+    "url": "https://tberra.com"
+  },
   "description": "Create and set wallpaper with Trianglify.",
   "version": "1.0.1",
   "private": true,
