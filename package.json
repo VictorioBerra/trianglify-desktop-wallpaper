@@ -16,6 +16,8 @@
   },
   "main": "background.js",
   "dependencies": {
+    "@victorioberra/trianglify-browser": "^4.1.1",
+    "@victorioberra/vuex-electron": "^1.2.3",
     "axios": "^0.21.0",
     "chroma-js": "^2.1.0",
     "core-js": "^3.6.5",
@@ -27,7 +29,6 @@
     "memoize-one": "^5.1.1",
     "mkdirp": "^1.0.4",
     "moment": "^2.29.1",
-    "trianglify": "^6.1.1",
     "uuid": "^8.3.1",
     "vue": "^2.6.11",
     "vue-cron-editor-vuetify": "^0.1.1",
@@ -35,7 +36,6 @@
     "vuetify": "^2.2.11",
     "vuetify-toast-snackbar": "^0.6.1",
     "vuex": "^3.5.1",
-    "vuex-electron": "^1.2.3",
     "wallpaper": "^4.4.1"
   },
   "devDependencies": {

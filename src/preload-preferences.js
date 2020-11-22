@@ -1,5 +1,5 @@
 import { ipcRenderer } from 'electron'
-import { createPersistedState, createSharedMutations } from "vuex-electron"
+import { createPersistedState, createSharedMutations } from "@victorioberra/vuex-electron"
 import log from 'electron-log';
 
 window.log = log.functions;

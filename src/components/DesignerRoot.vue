@@ -184,7 +184,7 @@
 }
 </style>
 <script>
-import trianglify from "trianglify";
+import trianglify from "@victorioberra/trianglify-browser";
 import Palette from "./Palette";
 import colorbrewer from "../colorbrewer";
 import memoizeOne from "memoize-one";

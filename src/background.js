@@ -27,7 +27,7 @@ import axios from 'axios'
 // Some real hacky stuff here for "vuex-electron"
 // "vuex-electron" needs to run here in the main process and also in renderer
 // Renderer uses preload and sets these on window.
-import { createPersistedState, createSharedMutations } from "vuex-electron"
+import { createPersistedState, createSharedMutations } from "@victorioberra/vuex-electron"
 import store from './plugins/vuex'
 import { start } from "repl";
 const storeInstance = store({ createPersistedState, createSharedMutations } )
