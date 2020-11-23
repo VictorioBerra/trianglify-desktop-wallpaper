@@ -6,7 +6,7 @@
     "url": "https://tberra.com"
   },
   "description": "Create and set wallpaper with Trianglify.",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "private": true,
   "license": "MIT",
   "scripts": {
@@ -29,6 +29,7 @@
     "cron": "^1.8.2",
     "custom-electron-titlebar": "^3.2.5",
     "electron-log": "^4.3.0",
+    "electron-updater": "^4.3.5",
     "lodash": "^4.17.20",
     "luxon": "^1.25.0",
     "memoize-one": "^5.1.1",

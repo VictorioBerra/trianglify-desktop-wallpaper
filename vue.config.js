@@ -1,6 +1,9 @@
 module.exports = {
   pluginOptions: {
     electronBuilder: {
+      builderOptions: {
+        publish: ['github']
+      },
       preload: {
         preload: 'src/preload.js',
         preloadPreferences: 'src/preload-preferences.js'

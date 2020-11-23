@@ -23,6 +23,7 @@ import { DateTime } from 'luxon';
 import log from 'electron-log';
 import _ from "lodash"
 import axios from 'axios'
+import { autoUpdater } from "electron-updater"
 
 // Some real hacky stuff here for "vuex-electron"
 // "vuex-electron" needs to run here in the main process and also in renderer
@@ -170,6 +171,7 @@ async function createWindow() {
     createProtocol("app");
     // Load the index.html when not in development
     mainWindow.loadURL("app://./index.html");
+    autoUpdater.checkForUpdatesAndNotify()
   }
 
   return mainWindow;
