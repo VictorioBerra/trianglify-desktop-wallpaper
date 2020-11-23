@@ -76,14 +76,15 @@
               <v-icon>mdi-shuffle-variant</v-icon>
             </v-btn>
 
-            <v-tabs grow>
+            <!-- Re-enable tabs when custom palette builder is done  -->
+            <!-- <v-tabs grow>
               <v-tab>
                 Preset Palette
               </v-tab>
               <v-tab>
                 Custom Palette
               </v-tab>
-              <v-tab-item>
+              <v-tab-item> -->
                 <v-list
                   dense
                   style="max-height: 600px"
@@ -101,7 +102,7 @@
                     </v-list-item>
                   </v-list-item-group>
                 </v-list>
-              </v-tab-item>
+              <!-- </v-tab-item>
               <v-tab-item class="mt-2">
                 <v-dialog v-model="dialog" width="500">
                   <template v-slot:activator="{ on, attrs }">
@@ -141,7 +142,7 @@
                   </v-card>
                 </v-dialog>
               </v-tab-item>
-            </v-tabs>
+            </v-tabs> -->
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
