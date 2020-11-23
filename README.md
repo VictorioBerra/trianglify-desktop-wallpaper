@@ -1,5 +1,11 @@
 # triangle-wallpaper
 
+Generate pleasing triangular wallpapers, and set them to change on a schedule.
+
+Powered by https://github.com/qrohlf/trianglify/
+
+[![triangle-wallpaper](https://snapcraft.io/triangle-wallpaper/badge.svg)](https://snapcraft.io/triangle-wallpaper)
+
 ## TODO
 
 - Auto Update
