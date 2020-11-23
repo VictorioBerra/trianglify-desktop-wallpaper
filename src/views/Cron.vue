@@ -7,6 +7,8 @@
 
     <v-text-field class="mt-4"
       label="Webhook"
+      persistent-hint
+      hint="Send an HTTP POST to a URL when the wallpaper is changed."
       v-model="randomCronWebhook"
     ></v-text-field>
   </div>
