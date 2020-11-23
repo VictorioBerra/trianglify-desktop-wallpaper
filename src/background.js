@@ -55,7 +55,7 @@ protocol.registerSchemesAsPrivileged([
 
 app.setAboutPanelOptions({
   applicationName: "About Trianglify Wallpaper",
-  applicationVersion: "1.0.0",
+  applicationVersion: app.getVersion(),
   copyright: "Victorio Berra 2020",
   authors: ["Victorio Berra"],
   website: "https://www.tberra.com/",
