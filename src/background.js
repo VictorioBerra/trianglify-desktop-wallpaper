@@ -108,6 +108,17 @@ async function createWindow() {
         winPreferences.show();
       },
     },
+    {
+      label: "Designer",
+      submenu: [
+        {
+          label: "Generate and Set",
+          click: () => {
+            win.webContents.send('cron-set-random-wallpaper-command', 'TODO: palette or some payload.');
+          },
+        },
+      ],
+    },
     { label: "About", type: "normal", role: "about" },
     {
       label: "Quit",
@@ -248,7 +259,7 @@ app.on("ready", async () => {
 
   randomCronWallpaperJob = new cron.CronJob(storeInstance.state.randomCronExpression, async function() {
     log.info("CronJob random wallpaper job ran.");
-    win.webContents.send('cron-set-random-wallpaper-command', 'TODO: pallet or some payload.');
+    win.webContents.send('cron-set-random-wallpaper-command', 'TODO: palette or some payload.');
 
     var randomCronWebhook = storeInstance.state.randomCronWebhook;
     if(randomCronWebhook !== null && randomCronWebhook.trim() !== "") {
