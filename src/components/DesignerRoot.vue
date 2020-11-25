@@ -295,7 +295,11 @@ export default {
     strokeWidth: function() {
       this.generateTrianglifyCanvas();
     },
-    selectedColorPallet: function() {
+    selectedColorPallet: function(newValue, oldValue) {
+      // Prevent unselecting, it seems like confusing UX
+      if(newValue === undefined) {
+        this.selectedColorPallet = oldValue;
+      }
       this.generateTrianglifyCanvas();
     },
   },
@@ -394,6 +398,11 @@ export default {
   created: function() {
     this.tempPath = window.ipcRenderer.sendSync("get-path-message", "temp");
     const screens = window.ipcRenderer.sendSync("get-screens-message");
+
+    // Set an initial color selection
+    if(this.selectedColorPallet === null) {
+      this.selectedColorPallet = Object.keys(this.palettes)[10];
+    }
 
     this.screens = screens.all.map(function(screen) {
       return {
