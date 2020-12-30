@@ -76,73 +76,62 @@
               <v-icon>mdi-shuffle-variant</v-icon>
             </v-btn>
 
-            <!-- Re-enable tabs when custom palette builder is done  -->
-            <!-- <v-tabs grow>
+            <v-tabs grow v-model="paletteTab">
               <v-tab>
                 Preset Palette
               </v-tab>
               <v-tab>
                 Custom Palette
               </v-tab>
-              <v-tab-item> -->
-                <v-list
-                  dense
-                  style="max-height: 600px"
-                  class="overflow-y-auto mt-2"
-                >
-                  <v-list-item-group v-model="selectedColorPallet">
-                    <v-list-item
-                      v-for="(palette, name) in palettes"
-                      :key="name"
-                      :value="name"
-                    >
-                      <v-list-item-content>
-                        <Palette v-bind:colors="palette" />
-                      </v-list-item-content>
-                    </v-list-item>
-                  </v-list-item-group>
-                </v-list>
-              <!-- </v-tab-item>
-              <v-tab-item class="mt-2">
-                <v-dialog v-model="dialog" width="500">
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="primary" dark v-bind="attrs" v-on="on">
-                      Add
-                    </v-btn>
-                  </template>
+              <v-tabs-items v-model="paletteTab">
+                <v-tab-item>
+                  <v-list
+                    dense
+                    style="max-height: 600px"
+                    class="overflow-y-auto mt-2"
+                  >
+                    <v-list-item-group v-model="selectedColorPallet">
+                      <v-list-item
+                        v-for="(palette, index) in palettes"
+                        :key="index"
+                        :value="index"
+                      >
+                        <v-list-item-content>
+                          <Palette v-bind:colors="palette" />
+                        </v-list-item-content>
+                      </v-list-item>
+                    </v-list-item-group>
+                  </v-list>
+                </v-tab-item>
+                <v-tab-item class="mt-2">
 
-                  <v-card>
-                    <v-card-title>
-                      <span class="headline">Custom Color Palette</span>
-                    </v-card-title>
+                  <custom-palette-designer @save="saveCustomPalette" />
 
-                    <v-card-text>
-                      <v-card class="d-md-flex" flat tile>
-                        <v-card
-                          v-for="color in randomPalette(4)"
-                          :key="color"
-                          :style="{ backgroundColor: color }"
-                          class="pa-4 flex-grow-1"
-                          tile
-                        >
-                        </v-card>
-                        <v-card class="pa-4" tile>
-                          <v-btn icon class="transparent" block
-                            ><v-icon>mdi-plus</v-icon></v-btn
-                          >
-                        </v-card>
-                        <v-card class="pa-4" tile>
-                          <v-btn icon class="transparent" block
-                            ><v-icon>mdi-minus</v-icon></v-btn
-                          >
-                        </v-card>
-                      </v-card>
-                    </v-card-text>
-                    <v-divider></v-divider>
-                  </v-card>
-                </v-dialog>
-              </v-tab-item>
-            </v-tabs> -->
+                  <v-list
+                    dense
+                    style="max-height: 600px"
+                    class="overflow-y-auto mt-2"
+                  >
+                    <v-list-item-group v-model="selectedCustomColorPalette">
+                      <v-list-item
+                        v-for="(palette, index) in customPalettes"
+                        :key="index"
+                        :value="index"
+                      >
+                        <v-list-item-content>
+                          <v-card class="d-flex" flat tile elevation="0">
+                            <v-btn icon tile small @click="removeCustomColor(palette, index)"
+                              ><v-icon>mdi-delete</v-icon></v-btn
+                            >
+                            <Palette v-bind:colors="palette" :selectable="true" />
+                          </v-card>
+                        </v-list-item-content>
+                      </v-list-item>
+                    </v-list-item-group>
+                  </v-list>
+                </v-tab-item>
+              </v-tabs-items>
+            </v-tabs>
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
@@ -187,8 +176,11 @@
 <script>
 import trianglify from "@victorioberra/trianglify-browser";
 import Palette from "./Palette";
+import CustomPaletteDesigner from "./CustomPaletteDesigner";
 import colorbrewer from "../colorbrewer";
+
 import memoizeOne from "memoize-one";
+import { v4 as uuidv4 } from 'uuid';
 // import { mapState, mapActions } from 'vuex'
 
 let memoizedInterpolateLinearColorFunction = memoizeOne(
@@ -201,6 +193,7 @@ export default {
   name: "DesignerRoot",
   components: {
     Palette,
+    CustomPaletteDesigner,
   },
   data: () => ({
     customizationPanel: 0,
@@ -265,6 +258,30 @@ export default {
         await this.$store.dispatch("selectedColorPallet", value);
       },
     },
+    selectedCustomColorPalette: {
+      get() {
+        return this.$store.state.selectedCustomColorPalette;
+      },
+      async set(value) {
+        await this.$store.dispatch("selectedCustomColorPalette", value);
+      },
+    },
+    customPalettes: {
+      get() {
+        return this.$store.state.customColorPalettes;
+      },
+      async set(value) {
+        await this.$store.dispatch("customColorPalettes", value);
+      },
+    },
+    paletteTab: {
+      get() {
+        return this.$store.state.paletteTab;
+      },
+      async set(value) {
+        await this.$store.dispatch("paletteTab", value);
+      },
+    },
   },
   watch: {
     selectedScreenId: function(val) {
@@ -297,19 +314,24 @@ export default {
     },
     selectedColorPallet: function(newValue, oldValue) {
       // Prevent unselecting, it seems like confusing UX
-      if(newValue === undefined) {
+      if (newValue === undefined) {
         this.selectedColorPallet = oldValue;
+      }
+      this.generateTrianglifyCanvas();
+    },
+    selectedCustomColorPalette: function(newValue, oldValue) {
+      // Prevent unselecting, it seems like confusing UX
+      if (newValue === undefined) {
+        this.selectedCustomColorPalette = oldValue;
       }
       this.generateTrianglifyCanvas();
     },
   },
   methods: {
-    randomPalette(amount) {
-      return _.take(_.sample(this.palettes), amount);
-    },
     randomize() {
       let trianglifyOptions = randomizeTrianglifyOptions();
       this.selectedColorPallet = null;
+      this.selecteCustomColorPallet = null;
       this.patternIntensity = trianglifyOptions.patternIntensity;
       this.triangleVariance = trianglifyOptions.triangleVariance;
       this.cellSize = trianglifyOptions.cellSize;
@@ -333,13 +355,17 @@ export default {
         this.$toast.success(`Wallpaper saved to ${this.savePathTooltip}!`);
       }
     },
-    cronSetWallpaperCommandWebhookHandler(){
-      window.log.error(arguments)
+    cronSetWallpaperCommandWebhookHandler() {
+      window.log.error(arguments);
     },
     cronSetWallpaperCommandHandler() {
       window.log.info("DesignerRoot handling random wallpaper set request.");
 
-      let trianglifyOptions = randomizeTrianglifyOptions();
+      // var combinedPalettes = _.assign(
+      //   {},
+      //   JSON.parse(JSON.stringify(this.palettes)),
+      //   JSON.parse(JSON.stringify(this.customPalettes))
+      // );
 
       let opts = {
         palette: this.palettes,
@@ -347,11 +373,13 @@ export default {
         height: this.selectedScreenHeight,
         cellSize:
           Math.max(this.selectedScreenWidth, this.selectedScreenHeight) *
-          trianglifyOptions.cellSize,
-        variance: trianglifyOptions.triangleVariance,
+          this.cellSize,
+        variance: this.triangleVariance,
         xColors: "random",
+        fill: this.fill,
+        strokeWidth: this.strokeWidth,
         colorFunction: memoizedInterpolateLinearColorFunction(
-          trianglifyOptions.patternIntensity
+          this.patternIntensity
         ),
       };
 
@@ -370,6 +398,22 @@ export default {
     save: async function() {
       window.ipcRenderer.send("save-wallpaper-message", this.wallpaper);
     },
+    async saveCustomPalette(palette) {
+      const newColorPaletteKey = uuidv4();
+      this.$set(this.customPalettes, newColorPaletteKey, palette)
+      this.selectedCustomColorPalette = newColorPaletteKey;
+      await this.$store.dispatch("customColorPalettes", this.customPalettes);
+    },
+    async removeCustomColor(palette, index) {
+      return this.$confirm('Do you really want to remove this custom palette?').then((res) => {
+        if(res) {
+          if(Object.keys(this.customPalettes).length > 0) {
+            this.selectedCustomColorPalette = Object.keys(this.customPalettes)[0];
+          }
+          this.$delete(this.customPalettes, index)
+        }
+      })
+    },
   },
   mounted() {
     // TODO: consistency
@@ -379,7 +423,9 @@ export default {
       this.wallpaperSaveEventHandler
     );
     window.cronSetWallpaperCommand(this.cronSetWallpaperCommandHandler);
-    window.cronSetWallpaperCommandWebhook(this.cronSetWallpaperCommandWebhookHandler);
+    window.cronSetWallpaperCommandWebhook(
+      this.cronSetWallpaperCommandWebhookHandler
+    );
     this.mainDesignerCanvas = document.getElementById("mainDesignerCanvas");
     this.randomCronCanvas = document.getElementById("randomCronCanvas");
   },
@@ -393,14 +439,16 @@ export default {
       this.wallpaperSaveEventHandler
     );
     window.cronSetWallpaperCommandRemove(this.cronSetWallpaperCommandHandler);
-    window.cronSetWallpaperCommandWebhookRemove(this.cronSetWallpaperCommandWebhookHandler);
+    window.cronSetWallpaperCommandWebhookRemove(
+      this.cronSetWallpaperCommandWebhookHandler
+    );
   },
   created: function() {
     this.tempPath = window.ipcRenderer.sendSync("get-path-message", "temp");
     const screens = window.ipcRenderer.sendSync("get-screens-message");
 
     // Set an initial color selection
-    if(this.selectedColorPallet === null) {
+    if (this.selectedColorPallet === null) {
       this.selectedColorPallet = Object.keys(this.palettes)[10];
     }
 
@@ -415,10 +463,18 @@ export default {
     let selectedScreen = this.screens.find((x) => x.isPrimary);
     this.selectedScreenId = selectedScreen.id;
 
+    let combinedPalettes = _.assign(
+      {},
+      JSON.parse(JSON.stringify(this.palettes)),
+      JSON.parse(JSON.stringify(this.customPalettes))
+    );
+
+    console.log(combinedPalettes);
+
     // https://stackoverflow.com/a/49780382/1777780
     this.generateTrianglifyCanvas = _.debounce(() => {
       let opts = {
-        palette: this.palettes,
+        palette: combinedPalettes,
         width: this.selectedScreenWidth,
         height: this.selectedScreenHeight,
         cellSize:
@@ -433,8 +489,16 @@ export default {
         ),
       };
 
-      if (this.selectedColorPallet !== null && this.selectedColorPallet) {
-        opts.xColors = this.palettes[this.selectedColorPallet];
+      if(this.paletteTab === 0) {
+        if (this.selectedColorPallet !== null && this.selectedColorPallet) {
+          opts.xColors = this.palettes[this.selectedColorPallet];
+        }
+      }
+
+      if(this.paletteTab === 1) {
+        if (this.selectedCustomColorPalette !== null && this.selectedCustomColorPalette) {
+          opts.xColors = this.customPalettes[this.selectedCustomColorPalette];
+        }
       }
 
       const pattern = trianglify(opts);

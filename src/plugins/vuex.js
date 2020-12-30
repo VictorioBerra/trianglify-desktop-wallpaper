@@ -23,6 +23,9 @@ export default (vuexElectronDeps) => new Vuex.Store({
 		fill: true,
 		strokeWidth: 0,
 		selectedColorPallet: null,
+		selectedCustomColorPalette: null,
+		customColorPalettes: {},
+		paletteTab: 0,
 	},
 	mutations: {
 		triangleVarianceSet(state, payload) {
@@ -42,6 +45,15 @@ export default (vuexElectronDeps) => new Vuex.Store({
 		},
 		selectedColorPalletSet(state, payload) {
 			state.selectedColorPallet = payload;
+		},
+		selectedCustomColorPaletteSet(state, payload) {
+			state.selectedCustomColorPalette = payload;
+		},
+		customColorPalettesSet(state, payload) {
+			state.customColorPalettes = payload;
+		},
+		paletteTabSet(state, payload) {
+			state.paletteTab = payload;
 		},
 
 		randomCronWebhookSet(state, payload) {
@@ -76,6 +88,15 @@ export default (vuexElectronDeps) => new Vuex.Store({
 		},
 		selectedColorPallet({ commit }, colorpalette) {
 			commit('selectedColorPalletSet', colorpalette);
+		},
+		selectedCustomColorPalette({ commit }, colorpalette) {
+			commit('selectedCustomColorPaletteSet', colorpalette);
+		},
+		customColorPalettes({ commit }, colorpalettes) {
+			commit('customColorPalettesSet', colorpalettes);
+		},
+		paletteTab({ commit }, tab) {
+			commit('paletteTabSet', tab);
 		},
 
 		randomCronWebhook({ commit }, enabled) {

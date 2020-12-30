@@ -41,6 +41,7 @@
     "vue-cron-editor-vuetify": "^0.1.1",
     "vue-router": "^3.2.0",
     "vuetify": "^2.2.11",
+    "vuetify-confirm": "^2.0.6",
     "vuetify-toast-snackbar": "^0.6.1",
     "vuex": "^3.5.1",
     "wallpaper": "^4.4.2"

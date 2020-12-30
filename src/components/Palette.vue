@@ -2,17 +2,16 @@
   <div>
     <!-- v-dialog width to match canvas 300 -->
     <v-dialog v-model="dialog" width="300"> 
-      <template v-slot:activator="{ on, attrs }">
-        <v-card class="d-md-flex" flat tile>
+      <template v-slot:activator="{ attrs }">
+        <v-card class="d-flex flex-wrap" flat tile>
           <v-card
             v-for="(color, index) in colors"
             :key="index"
             :style="{ backgroundColor: color }"
             class="pa-4 flex-grow-1"
             tile
-            v-bind="attrs"
+            v-bind="attrs" elevation="0"
             @click="editColor(color, index)"
-            v-on="on"
           >
           </v-card>
         </v-card>
@@ -31,7 +30,7 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="secondary" text @click="dialog = false">
+          <v-btn color="primary darken-1" text @click="dialog = false">
             Close
           </v-btn>
           <v-btn color="primary" text @click="saveColor"> Save </v-btn>

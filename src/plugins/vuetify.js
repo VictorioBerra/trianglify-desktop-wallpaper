@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuetify, { VSnackbar, VBtn, VIcon } from 'vuetify/lib'
 import VuetifyToast from 'vuetify-toast-snackbar'
+import VuetifyConfirm from 'vuetify-confirm'
 
 Vue.use(Vuetify, {
   components: {
@@ -15,5 +16,7 @@ const veutifyObj = new Vuetify({
 });
 
 Vue.use(VuetifyToast, { $vuetify: veutifyObj.framework })
+
+Vue.use(VuetifyConfirm, { vuetify: veutifyObj })
 
 export default veutifyObj;

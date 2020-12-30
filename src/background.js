@@ -403,7 +403,7 @@ ipcMain.on('copy-wallpaper-message', async (event, arg) => {
 });
 
 ipcMain.on('set-window-hide-message', (event, arg) => {
-  console.log('set-window-hide-message', arg);
+  //console.log('set-window-hide-message', arg);
   if(arg === "main") {
     win.hide();
   }
