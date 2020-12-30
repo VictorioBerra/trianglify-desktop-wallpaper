@@ -26,6 +26,8 @@ export default (vuexElectronDeps) => new Vuex.Store({
 		selectedCustomColorPalette: null,
 		customColorPalettes: {},
 		paletteTab: 0,
+		selectedScreenHeight: null,
+		selectedScreenWidth: null,
 	},
 	mutations: {
 		triangleVarianceSet(state, payload) {
@@ -39,6 +41,18 @@ export default (vuexElectronDeps) => new Vuex.Store({
 		},
 		fillSet(state, payload) {
 			state.fill = payload;
+		},
+		selectedScreenHeightSet(state, payload) {
+			if(!payload) {
+				payload = 600;
+			}
+			state.selectedScreenHeight = payload;
+		},
+		selectedScreenWidthSet(state, payload) {
+			if(!payload) {
+				payload = 600;
+			}
+			state.selectedScreenWidth = payload;
 		},
 		strokeWidthSet(state, payload) {
 			state.strokeWidth = payload;
@@ -82,6 +96,12 @@ export default (vuexElectronDeps) => new Vuex.Store({
 		},
 		fill({ commit }, fill) {
 			commit('fillSet', fill);
+		},
+		selectedScreenHeight({ commit }, fill) {
+			commit('selectedScreenHeightSet', fill);
+		},
+		selectedScreenWidth({ commit }, fill) {
+			commit('selectedScreenWidthSet', fill);
 		},
 		strokeWidth({ commit }, strokeWidth) {
 			commit('strokeWidthSet', strokeWidth);

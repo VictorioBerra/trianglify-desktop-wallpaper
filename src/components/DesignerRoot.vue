@@ -26,17 +26,22 @@
           <v-expansion-panel-header ripple>Customize</v-expansion-panel-header>
           <v-expansion-panel-content>
             <v-row>
-              <v-col cols="6">
+              <v-col cols="4">
                 <v-text-field
                   v-model="selectedScreenHeight"
                   label="Height"
                 ></v-text-field>
               </v-col>
-              <v-col cols="6">
+              <v-col cols="4">
                 <v-text-field
                   v-model="selectedScreenWidth"
                   label="Width"
                 ></v-text-field>
+              </v-col>
+              <v-col cols="4">
+                <v-btn tile class="" block @click="resetSelectedMonitorHeightWidth" text>
+                  Reset
+                </v-btn>
               </v-col>
             </v-row>
 
@@ -203,8 +208,6 @@ export default {
 
     selectedScreenId: null,
     selectedScreen: null,
-    selectedScreenHeight: null,
-    selectedScreenWidth: null,
   }),
   computed: {
     savePathTooltip() {
@@ -232,6 +235,22 @@ export default {
       },
       async set(value) {
         await this.$store.dispatch("cellSize", value);
+      },
+    },
+    selectedScreenHeight: {
+      get() {
+        return this.$store.state.selectedScreenHeight;
+      },
+      async set(value) {
+        await this.$store.dispatch("selectedScreenHeight", value);
+      },
+    },
+    selectedScreenWidth: {
+      get() {
+        return this.$store.state.selectedScreenWidth;
+      },
+      async set(value) {
+        await this.$store.dispatch("selectedScreenWidth", value);
       },
     },
     fill: {
@@ -287,8 +306,6 @@ export default {
     selectedScreenId: function(val) {
       let selectedScreen = this.screens.find((x) => x.id == val);
       this.selectedScreen = selectedScreen;
-      this.selectedScreenHeight = selectedScreen.size.height;
-      this.selectedScreenWidth = selectedScreen.size.width;
     },
     selectedScreenWidth: function() {
       this.generateTrianglifyCanvas();
@@ -414,6 +431,12 @@ export default {
         }
       })
     },
+    resetSelectedMonitorHeightWidth() {
+        // Just set to primary for now.
+        let selectedScreen = this.screens.find((x) => x.isPrimary);
+        this.selectedScreenHeight = selectedScreen.size.height;
+        this.selectedScreenWidth = selectedScreen.size.width;
+    }
   },
   mounted() {
     // TODO: consistency
@@ -462,6 +485,14 @@ export default {
 
     let selectedScreen = this.screens.find((x) => x.isPrimary);
     this.selectedScreenId = selectedScreen.id;
+
+    // Initial set of width and height
+    if(!this.selectedScreenHeight) {
+      this.selectedScreenHeight = selectedScreen.size.height;
+    }
+    if(!this.selectedScreenWidth) {
+      this.selectedScreenWidth = selectedScreen.size.width;
+    }
 
     let combinedPalettes = _.assign(
       {},
