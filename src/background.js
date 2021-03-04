@@ -17,7 +17,6 @@ import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import { v4 as uuidv4 } from "uuid";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 import mkdirp from "mkdirp";
-import { combinedDisposable } from "custom-electron-titlebar/lib/common/lifecycle";
 import cron from "cron"
 import { DateTime } from 'luxon';
 import log from 'electron-log';
@@ -34,7 +33,7 @@ import { start } from "repl";
 const storeInstance = store({ createPersistedState, createSharedMutations } )
 
 // Set up settings and defaults
-let imageSavePath = storeInstance.state.settings.image.saveFolder;
+let imageSavePath = storeInstance.state.settings.image.savePath;
 if (!imageSavePath) {
   const defaultImageSavePath = path.join(
     app.getPath("pictures"),
@@ -385,7 +384,7 @@ ipcMain.on('copy-wallpaper-message', async (event, arg) => {
   let userSettings = await storeInstance.state.settings;
 
   const newFileName = `${uuidv4().toString()}.png`;
-  let newFilePath = path.join(userSettings.image.folder, newFileName);
+  let newFilePath = path.join(userSettings.image.savePath, newFileName);
   response.newFileName = newFilePath;
 
   var currentWallpaper = await wallpaper.get();

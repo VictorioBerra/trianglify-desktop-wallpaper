@@ -11,7 +11,7 @@ export default (vuexElectronDeps) => new Vuex.Store({
 	state: {
 		settings: {
 			image: {
-				saveFolder: null // set in background.js
+				savePath: null // set in background.js
 			}
 		},
 		enableRandomCron: false,
