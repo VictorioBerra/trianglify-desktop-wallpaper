@@ -52,18 +52,10 @@ protocol.registerSchemesAsPrivileged([
   { scheme: "app", privileges: { secure: true, standard: true } },
 ]);
 
-app.setAboutPanelOptions({
-  applicationName: "About Trianglify Wallpaper",
-  applicationVersion: app.getVersion(),
-  copyright: "Victorio Berra 2020",
-  authors: ["Victorio Berra"],
-  website: "https://www.tberra.com/",
-  iconPath: iconpath,
-});
-
 let win = null;
 let randomCronWallpaperJob = null;
 let winPreferences = null;
+let winAbout = null;
 let tray = null;
 
 async function createWindow() {
@@ -118,7 +110,13 @@ async function createWindow() {
         },
       ],
     },
-    { label: "About", type: "normal", role: "about" },
+    {
+      label: "About",
+      type: "normal",
+      click: function() {
+        winAbout.show();
+      },
+    },
     {
       label: "Quit",
       type: "normal",
@@ -166,7 +164,9 @@ async function createWindow() {
       submenu: [
         {
           label: "About",
-          role: 'about'
+          click: () => {
+            winAbout.show();
+          },
         },
       ],
     },
@@ -218,6 +218,37 @@ async function createPreferencesWindow() {
   return preferencesWindow;
 }
 
+async function createAboutWindow() {
+
+  let aboutWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    frame: false,
+    show: false,
+    titleBarStyle: "hidden",
+    title: "Trianglify Wallpaper About",
+    webPreferences: {
+      // Use pluginOptions.nodeIntegration, leave this alone
+      // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
+      nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
+      preload: path.join(__dirname, "preloadAbout.js"),
+    },
+    icon: iconpath,
+  });
+
+  if (process.env.WEBPACK_DEV_SERVER_URL) {
+    // Load the url of the dev server if in development mode
+    await aboutWindow.loadURL(process.env.WEBPACK_DEV_SERVER_URL + "about");
+    if (!process.env.IS_TEST) aboutWindow.webContents.openDevTools();
+  } else {
+    createProtocol("app");
+    // Load the index.html when not in development
+    aboutWindow.loadURL("app://./about.html");
+  }
+
+  return aboutWindow;
+}
+
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {
   // On macOS it is common for applications and their menu bar
@@ -237,6 +268,9 @@ app.on("activate", async () => {
   if (winPreferences === null) {
     winPreferences = await createPreferencesWindow('preferences', 'preferences.html')
   }
+  if (winAbout === null) {
+    winAbout = await createAboutWindow('about', 'about.html')
+  }
 });
 
 // This method will be called when Electron has finished
@@ -255,6 +289,7 @@ app.on("ready", async () => {
   win.maximize();
   win.show();
   winPreferences = await createPreferencesWindow();
+  winAbout = await createAboutWindow();
 
   randomCronWallpaperJob = new cron.CronJob(storeInstance.state.randomCronExpression, async function() {
     log.info("CronJob random wallpaper job ran.");
@@ -409,14 +444,20 @@ ipcMain.on('set-window-hide-message', (event, arg) => {
   if(arg === "preferences") {
     winPreferences.hide();
   }
+  if(arg === "about") {
+    winAbout.hide();
+  }
 });
 
 ipcMain.on('set-window-show-message', (event, arg) => {
   if(arg === "main") {
-    winPreferences.show();
+    win.show();
   }
   if(arg === "preferences") {
     winPreferences.show();
+  }
+  if(arg === "about") {
+    winAbout.show();
   }
 });
 
@@ -438,6 +479,10 @@ ipcMain.on("set-preferences-closed", (event, arg) => {
     all: screen.getAllDisplays(),
     primary: screen.getPrimaryDisplay(),
   };
+});
+
+ipcMain.handle("get-app-version", () => {
+  return app.getVersion();
 });
 
 async function saveWallpaperipcMainHandler(event, dataUrl){

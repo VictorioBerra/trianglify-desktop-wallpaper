@@ -11,7 +11,8 @@ module.exports = {
       },
       preload: {
         preload: 'src/preload.js',
-        preloadPreferences: 'src/preload-preferences.js'
+        preloadPreferences: 'src/preload-preferences.js',
+        preloadAbout: 'src/preload-about.js',
       }
     }
   },
@@ -27,6 +28,11 @@ module.exports = {
       entry: 'src/main-preferences.js',
       template: 'public/index.html',
       title: 'Trianglify Wallpaper Preferences'
+    },
+    about: {
+      entry: 'src/main-about.js',
+      template: 'public/index.html',
+      title: 'Trianglify Wallpaper About'
     }
   }
 }

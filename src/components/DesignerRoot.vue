@@ -28,14 +28,14 @@
             <v-row>
               <v-col cols="4">
                 <v-text-field
-                  v-model="selectedScreenHeight"
-                  label="Height"
+                  v-model="selectedScreenWidth"
+                  label="Width"
                 ></v-text-field>
               </v-col>
               <v-col cols="4">
                 <v-text-field
-                  v-model="selectedScreenWidth"
-                  label="Width"
+                  v-model="selectedScreenHeight"
+                  label="Height"
                 ></v-text-field>
               </v-col>
               <v-col cols="4">
