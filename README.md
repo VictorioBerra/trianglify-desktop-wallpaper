@@ -17,3 +17,8 @@ Powered by https://github.com/qrohlf/trianglify/
 ### Scheduler
 
 ![Scheduler](Screenshots/cron.png?raw=true "Scheduler")
+
+## Downloads
+
+- Snap: https://snapcraft.io/triangle-wallpaper
+- Releases: https://github.com/VictorioBerra/trianglify-desktop-wallpaper/releases/latest
