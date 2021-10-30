@@ -6,7 +6,7 @@
     "url": "https://tberra.com"
   },
   "description": "Create and set wallpaper with Trianglify.",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "private": true,
   "license": "GPL-3.0",
   "scripts": {
