@@ -12,6 +12,8 @@ import {
   Notification,
   Menu,
   ipcMain,
+  clipboard,
+  nativeImage,
 } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import { v4 as uuidv4 } from "uuid";
@@ -407,6 +409,13 @@ ipcMain.on("save-wallpaper-message", async (event, dataUrl) => {
   await saveWallpaperipcMainHandler(event, dataUrl);
 
   event.reply("save-wallpaper-reply");
+});
+
+ipcMain.on("clipboard-wallpaper-message", async (event, dataUrl) => {
+
+  clipboard.writeImage(nativeImage.createFromDataURL(dataUrl));
+
+  event.reply("clipboard-wallpaper-reply");
 });
 
 ipcMain.on('copy-wallpaper-message', async (event, arg) => {

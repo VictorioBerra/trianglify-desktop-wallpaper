@@ -163,6 +163,13 @@
           </template>
           <span>{{ savePathTooltip }}</span>
         </v-tooltip>
+        <v-btn
+          v-on:click="clipboard"
+          color="pink lighten-1"
+          tile
+          x-large
+          >Copy to Clipboard</v-btn
+        >
       </v-row>
     </v-col>
   </v-row>
@@ -415,6 +422,9 @@ export default {
     save: async function() {
       window.ipcRenderer.send("save-wallpaper-message", this.wallpaper);
     },
+    clipboard: async function() {
+      window.ipcRenderer.send("clipboard-wallpaper-message", this.wallpaper);
+    },
     async saveCustomPalette(palette) {
       const newColorPaletteKey = uuidv4();
       this.$set(this.customPalettes, newColorPaletteKey, palette)
@@ -444,6 +454,10 @@ export default {
     window.ipcRenderer.on(
       "save-wallpaper-reply",
       this.wallpaperSaveEventHandler
+    );
+      window.ipcRenderer.on(
+      "clipboard-wallpaper-reply",
+      () => this.$toast.success(`Wallpaper copied!`)
     );
     window.cronSetWallpaperCommand(this.cronSetWallpaperCommandHandler);
     window.cronSetWallpaperCommandWebhook(
